@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
   <meta name="description" content="Professional portfolio generator for job seekers - create and share your portfolio in minutes">
   <meta name="theme-color" content="#6366f1">
   <title>Career Portfolio Generator | Professional Portfolio Kit</title>
@@ -19,10 +19,12 @@
     <aside class="editor-sidebar" id="editorSidebar">
       <div class="sidebar-header">
         <div class="sidebar-header-top">
-          <h2><i class="fas fa-magic"></i> Portfolio Builder</h2>
+          <div>
+            <h2><i class="fas fa-magic"></i> Portfolio Builder</h2>
+            <p class="sidebar-subtitle">Edit your data → Live preview</p>
+          </div>
           <button class="close-sidebar-btn" id="closeSidebarBtn"><i class="fas fa-times"></i></button>
         </div>
-        <p class="sidebar-subtitle">Edit your data → Live preview</p>
       </div>
 
       <div class="editor-content" id="editorContent">
@@ -66,10 +68,15 @@
           <div class="form-group">
             <label>Profile Image</label>
             <div class="image-upload-area">
+              <div class="current-image-preview" id="currentImagePreview">
+                <img id="imagePreview" src="https://via.placeholder.com/80" alt="Profile preview">
+              </div>
               <input type="text" id="imageUrlInput" placeholder="https://...">
               <div class="upload-divider">or</div>
-              <input type="file" id="profileUpload" accept="image/*" class="file-input">
-              <label for="profileUpload" class="file-label"><i class="fas fa-upload"></i> Upload Image</label>
+              <div class="file-upload-wrapper">
+                <input type="file" id="profileUpload" accept="image/*" class="file-input">
+                <label for="profileUpload" class="file-label"><i class="fas fa-upload"></i> Upload Image</label>
+              </div>
             </div>
           </div>
         </div>
@@ -169,11 +176,11 @@
     <!-- PORTFOLIO PREVIEW -->
     <main class="preview-area">
       <div class="sticky-toolbar">
-        <button class="mobile-menu-btn" id="openSidebarBtn"><i class="fas fa-edit"></i> Edit</button>
-        <button id="stickyDownloadCV" class="btn-primary"><i class="fas fa-download"></i> CV</button>
-        <button id="stickyDownloadResume" class="btn-primary"><i class="fas fa-file-alt"></i> Resume</button>
-        <button id="whatsappStickyBtn" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> <span class="btn-text">WhatsApp</span></button>
-        <button id="sharePortfolioBtn" class="btn-outline"><i class="fas fa-share-alt"></i> <span class="btn-text">Share</span></button>
+        <button class="mobile-menu-btn" id="openSidebarBtn"><i class="fas fa-edit"></i> <span>Edit Portfolio</span></button>
+        <button id="stickyDownloadCV" class="btn-primary"><i class="fas fa-download"></i> <span>CV</span></button>
+        <button id="stickyDownloadResume" class="btn-primary"><i class="fas fa-file-alt"></i> <span>Resume</span></button>
+        <button id="whatsappStickyBtn" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> <span>WhatsApp</span></button>
+        <button id="sharePortfolioBtn" class="btn-outline"><i class="fas fa-share-alt"></i> <span>Share</span></button>
         <button id="darkModeToggle" class="btn-outline"><i class="fas fa-moon"></i></button>
       </div>
       
