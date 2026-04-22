@@ -115,18 +115,64 @@
           <div class="tags-container" id="certsContainer"></div>
         </div>
 
-        <!-- Documents -->
+        <!-- Documents - Enhanced Version -->
         <div class="form-section">
           <h3><i class="fas fa-file-pdf"></i> Documents</h3>
-          <div class="form-group">
-            <label>CV (PDF)</label>
-            <input type="file" id="cvUpload" accept=".pdf" class="file-input">
-            <div id="cvFileName" class="file-name-display"></div>
+          
+          <!-- CV Section -->
+          <div class="document-upload-card" id="cvUploadCard">
+            <div class="document-header">
+              <div class="document-title">
+                <i class="fas fa-file-pdf" style="color: #ef4444;"></i>
+                <span>Curriculum Vitae (CV)</span>
+                <span class="document-badge">Required</span>
+              </div>
+              <button type="button" class="btn-icon" id="toggleCvOptions" title="More options">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+            
+            <div id="cvFileInfo" class="document-info">
+              <!-- Dynamic content will appear here -->
+            </div>
+            
+            <div class="document-actions" id="cvActions">
+              <div class="upload-area" id="cvUploadArea">
+                <input type="file" id="cvUpload" accept=".pdf" class="file-input-hidden">
+                <button type="button" class="btn-upload" id="cvUploadBtn">
+                  <i class="fas fa-cloud-upload-alt"></i> Upload CV
+                </button>
+                <span class="upload-hint">PDF only, max 10MB | Drag & drop supported</span>
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Resume (PDF)</label>
-            <input type="file" id="resumeUpload" accept=".pdf" class="file-input">
-            <div id="resumeFileName" class="file-name-display"></div>
+          
+          <!-- Resume Section -->
+          <div class="document-upload-card" id="resumeUploadCard">
+            <div class="document-header">
+              <div class="document-title">
+                <i class="fas fa-file-alt" style="color: #10b981;"></i>
+                <span>Professional Resume</span>
+                <span class="document-badge">Recommended</span>
+              </div>
+              <button type="button" class="btn-icon" id="toggleResumeOptions" title="More options">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+            
+            <div id="resumeFileInfo" class="document-info">
+              <!-- Dynamic content will appear here -->
+            </div>
+            
+            <div class="document-actions" id="resumeActions">
+              <div class="upload-area" id="resumeUploadArea">
+                <input type="file" id="resumeUpload" accept=".pdf" class="file-input-hidden">
+                <button type="button" class="btn-upload" id="resumeUploadBtn">
+                  <i class="fas fa-cloud-upload-alt"></i> Upload Resume
+                </button>
+                <span class="upload-hint">PDF only, max 10MB | Drag & drop supported</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -210,6 +256,23 @@
               <button id="shareLinkedIn" class="btn-outline"><i class="fab fa-linkedin"></i> LinkedIn</button>
               <button id="shareTwitter" class="btn-outline"><i class="fab fa-twitter"></i> Twitter</button>
             </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Document Preview Modal -->
+      <div class="document-preview-modal" id="documentPreviewModal">
+        <div class="preview-modal-content">
+          <div class="preview-modal-header">
+            <h3 id="previewTitle">Document Preview</h3>
+            <button class="close-preview" id="closePreviewBtn">&times;</button>
+          </div>
+          <div class="preview-modal-body">
+            <iframe id="documentPreviewFrame" src="" style="width:100%; height:500px;" frameborder="0"></iframe>
+          </div>
+          <div class="preview-modal-footer">
+            <button class="btn-primary" id="downloadFromPreviewBtn"><i class="fas fa-download"></i> Download</button>
+            <button class="btn-outline" id="closePreviewFooterBtn">Close</button>
           </div>
         </div>
       </div>
