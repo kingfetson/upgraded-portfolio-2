@@ -1,6 +1,6 @@
 /* ============================================
    CAREER PORTFOLIO GENERATOR - COMPLETE STYLES
-   Fixed Mobile Menu, Beautiful UI
+   Enhanced Documents Management + All Features
    ============================================ */
 
 /* ----- CSS VARIABLES ----- */
@@ -20,6 +20,7 @@
   --primary-light: #818cf8;
   --primary-glow: rgba(99, 102, 241, 0.1);
   --success: #10b981;
+  --success-glow: rgba(16, 185, 129, 0.1);
   --danger: #ef4444;
   --warning: #f59e0b;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -49,6 +50,7 @@
   --primary-dark: #6366f1;
   --primary-light: #a5b4fc;
   --primary-glow: rgba(129, 140, 248, 0.15);
+  --success-glow: rgba(16, 185, 129, 0.15);
 }
 
 /* Theme Variations */
@@ -214,6 +216,374 @@ body {
 .quick-tips i {
   color: var(--primary);
   font-size: 1rem;
+}
+
+/* ============================================
+   ENHANCED DOCUMENTS SECTION STYLES
+   ============================================ */
+
+.document-upload-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: var(--transition);
+}
+
+.document-upload-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.document-upload-card.has-file {
+  border-color: var(--success);
+  background: linear-gradient(135deg, var(--bg-card), var(--success-glow));
+}
+
+.document-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.document-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.document-title i {
+  font-size: 1.2rem;
+}
+
+.document-badge {
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--primary-glow);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.btn-icon {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.btn-icon:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: rotate(90deg);
+}
+
+/* Document Info Display */
+.document-info {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  display: none;
+}
+
+.document-info.active {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.file-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.file-icon-large {
+  font-size: 2rem;
+  color: #ef4444;
+}
+
+.file-info-text {
+  flex: 1;
+}
+
+.file-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  word-break: break-all;
+  margin-bottom: 4px;
+}
+
+.file-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.file-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.file-actions-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.file-action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  color: var(--text-secondary);
+}
+
+.file-action-btn:hover {
+  background: var(--bg-card);
+  transform: scale(1.05);
+}
+
+.file-action-btn.delete:hover {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.file-action-btn.preview:hover {
+  color: var(--primary);
+}
+
+.file-action-btn.download:hover {
+  color: var(--success);
+}
+
+/* Document Actions */
+.document-actions {
+  transition: var(--transition);
+}
+
+.document-actions.hidden {
+  display: none;
+}
+
+.upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  transition: var(--transition);
+}
+
+.upload-area:hover {
+  border-color: var(--primary);
+  background: var(--primary-glow);
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.btn-upload {
+  padding: 10px 24px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.btn-upload:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.upload-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Upload Progress */
+.upload-progress {
+  margin-top: 10px;
+  width: 100%;
+  display: none;
+}
+
+.upload-progress.active {
+  display: block;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+/* Document Preview Modal */
+.document-preview-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.document-preview-modal.active {
+  display: flex;
+  animation: fadeIn 0.2s ease;
+}
+
+.preview-modal-content {
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+}
+
+.preview-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.preview-modal-header h3 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.close-preview {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+
+.close-preview:hover {
+  color: var(--danger);
+  transform: scale(1.1);
+}
+
+.preview-modal-body {
+  flex: 1;
+  overflow: auto;
+  background: #f1f5f9;
+  min-height: 400px;
+}
+
+.preview-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* Success Animation */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.document-upload-card.upload-success {
+  animation: pulse 0.5s ease;
+  border-color: var(--success);
+}
+
+/* Tooltip */
+[data-tooltip] {
+  position: relative;
+  cursor: pointer;
+}
+
+[data-tooltip]:before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+[data-tooltip]:hover:before {
+  opacity: 1;
 }
 
 /* FORM STYLES */
@@ -839,7 +1209,7 @@ button {
   gap: 10px;
 }
 
-/* DOCUMENTS SECTION */
+/* DOCUMENTS SECTION - Preview Cards */
 .documents-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1114,6 +1484,24 @@ button {
     grid-template-columns: 1fr;
     gap: 12px;
   }
+  
+  /* Document card responsive */
+  .file-details {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .file-actions-buttons {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .file-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
 
 /* Mobile Landscape */
@@ -1143,6 +1531,10 @@ button {
   
   .form-actions button {
     width: 100%;
+  }
+  
+  .preview-modal-body iframe {
+    height: 300px;
   }
 }
 
@@ -1190,6 +1582,14 @@ button {
   .doc-card {
     padding: 20px;
   }
+  
+  .document-upload-card {
+    padding: 16px;
+  }
+  
+  .file-icon-large {
+    font-size: 1.5rem;
+  }
 }
 
 /* Print Styles */
@@ -1198,7 +1598,8 @@ button {
   .sticky-toolbar,
   .share-modal,
   .toast-notification,
-  .mobile-overlay {
+  .mobile-overlay,
+  .document-preview-modal {
     display: none !important;
   }
   
