@@ -1,6 +1,6 @@
 // ============================================
 // CAREER PORTFOLIO GENERATOR - COMPLETE SCRIPT
-// Fixed Mobile Menu, Image Handling, All Features
+// Enhanced Documents Management + All Features
 // ============================================
 
 // ----- STATE MANAGEMENT -----
@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setupMobileInteractions();
   checkReducedMotion();
   updateImagePreview();
+  initEnhancedDocuments();
+  setupDocumentOptions();
 });
 
 function initializeApp() {
@@ -70,9 +72,367 @@ function updateImagePreview() {
   }
 }
 
+// ============================================
+// ENHANCED DOCUMENTS MANAGEMENT
+// ============================================
+
+function initEnhancedDocuments() {
+  setupDocumentUpload('cv');
+  setupDocumentUpload('resume');
+  setupDocumentPreview();
+  loadExistingDocuments();
+}
+
+function setupDocumentUpload(type) {
+  const uploadBtn = document.getElementById(`${type}UploadBtn`);
+  const fileInput = document.getElementById(`${type}Upload`);
+  const uploadArea = document.getElementById(`${type}UploadArea`);
+  
+  if (!uploadBtn || !fileInput) return;
+  
+  // Trigger file input click
+  uploadBtn.addEventListener('click', () => {
+    fileInput.click();
+  });
+  
+  // Drag and drop support
+  if (uploadArea) {
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = 'var(--primary)';
+      uploadArea.style.background = 'var(--primary-glow)';
+    });
+    
+    uploadArea.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = 'var(--border)';
+      uploadArea.style.background = 'var(--bg-input)';
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = 'var(--border)';
+      uploadArea.style.background = 'var(--bg-input)';
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') {
+        handleFileUpload(file, type);
+      } else {
+        showToast('Please drop a PDF file', 'error');
+      }
+    });
+  }
+  
+  // File input change
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type === 'application/pdf') {
+        if (file.size <= 10 * 1024 * 1024) {
+          handleFileUpload(file, type);
+        } else {
+          showToast('File too large. Max size is 10MB', 'error');
+        }
+      } else {
+        showToast('Please upload a PDF file', 'error');
+      }
+    }
+  });
+}
+
+function handleFileUpload(file, type) {
+  showUploadProgress(type, true);
+  
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress += 10;
+    updateProgressBar(type, progress);
+    if (progress >= 100) {
+      clearInterval(progressInterval);
+      completeFileUpload(file, type);
+    }
+  }, 50);
+}
+
+function updateProgressBar(type, percent) {
+  const progressDiv = document.getElementById(`${type}Progress`);
+  const fillDiv = document.getElementById(`${type}ProgressFill`);
+  if (progressDiv && fillDiv) {
+    progressDiv.classList.add('active');
+    fillDiv.style.width = `${percent}%`;
+    if (percent >= 100) {
+      setTimeout(() => {
+        progressDiv.classList.remove('active');
+        fillDiv.style.width = '0%';
+      }, 500);
+    }
+  }
+}
+
+function showUploadProgress(type, show) {
+  let progressDiv = document.getElementById(`${type}Progress`);
+  if (!progressDiv && show) {
+    const uploadArea = document.getElementById(`${type}UploadArea`);
+    if (uploadArea) {
+      progressDiv = document.createElement('div');
+      progressDiv.id = `${type}Progress`;
+      progressDiv.className = 'upload-progress';
+      progressDiv.innerHTML = `<div class="progress-bar"><div class="progress-fill" id="${type}ProgressFill"></div></div>`;
+      uploadArea.appendChild(progressDiv);
+    }
+  }
+}
+
+async function completeFileUpload(file, type) {
+  try {
+    const base64 = await fileToBase64(file);
+    
+    if (type === 'cv') {
+      portfolioData.cvFile = base64;
+      portfolioData.cvFileName = file.name;
+      portfolioData.cvFileSize = file.size;
+      portfolioData.cvUploadedAt = new Date().toISOString();
+    } else {
+      portfolioData.resumeFile = base64;
+      portfolioData.resumeFileName = file.name;
+      portfolioData.resumeFileSize = file.size;
+      portfolioData.resumeUploadedAt = new Date().toISOString();
+    }
+    
+    saveToStorage();
+    updateDocumentDisplay(type, file);
+    
+    const card = document.getElementById(`${type}UploadCard`);
+    if (card) {
+      card.classList.add('upload-success');
+      setTimeout(() => card.classList.remove('upload-success'), 500);
+    }
+    
+    showToast(`${type.toUpperCase()} uploaded successfully!`, 'success');
+    renderPortfolio();
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    showToast('Error uploading file. Please try again.', 'error');
+  }
+}
+
+function updateDocumentDisplay(type, file) {
+  const infoDiv = document.getElementById(`${type}FileInfo`);
+  const uploadArea = document.getElementById(`${type}UploadArea`);
+  const card = document.getElementById(`${type}UploadCard`);
+  
+  if (!infoDiv) return;
+  
+  const fileSize = formatFileSize(file.size);
+  const uploadDate = new Date().toLocaleDateString();
+  
+  infoDiv.innerHTML = `
+    <div class="file-details">
+      <div class="file-icon-large">
+        <i class="fas fa-file-pdf"></i>
+      </div>
+      <div class="file-info-text">
+        <div class="file-name">${escapeHtml(file.name)}</div>
+        <div class="file-meta">
+          <span><i class="fas fa-database"></i> ${fileSize}</span>
+          <span><i class="fas fa-calendar"></i> ${uploadDate}</span>
+          <span><i class="fas fa-check-circle" style="color: var(--success);"></i> Uploaded</span>
+        </div>
+      </div>
+      <div class="file-actions-buttons">
+        <button class="file-action-btn preview" data-type="${type}" data-tooltip="Preview PDF">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button class="file-action-btn download" data-type="${type}" data-tooltip="Download">
+          <i class="fas fa-download"></i>
+        </button>
+        <button class="file-action-btn replace" data-type="${type}" data-tooltip="Replace File">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+        <button class="file-action-btn delete" data-type="${type}" data-tooltip="Delete File">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `;
+  
+  infoDiv.classList.add('active');
+  if (uploadArea) uploadArea.style.display = 'none';
+  if (card) card.classList.add('has-file');
+  
+  // Add event listeners
+  const previewBtn = infoDiv.querySelector('.preview');
+  const downloadBtn = infoDiv.querySelector('.download');
+  const replaceBtn = infoDiv.querySelector('.replace');
+  const deleteBtn = infoDiv.querySelector('.delete');
+  
+  if (previewBtn) previewBtn.addEventListener('click', () => previewDocument(type));
+  if (downloadBtn) downloadBtn.addEventListener('click', () => downloadDocument(type));
+  if (replaceBtn) replaceBtn.addEventListener('click', () => replaceDocument(type));
+  if (deleteBtn) deleteBtn.addEventListener('click', () => deleteDocument(type));
+}
+
+function previewDocument(type) {
+  const fileData = type === 'cv' ? portfolioData.cvFile : portfolioData.resumeFile;
+  const fileName = type === 'cv' ? portfolioData.cvFileName : portfolioData.resumeFileName;
+  
+  if (fileData) {
+    const modal = document.getElementById('documentPreviewModal');
+    const frame = document.getElementById('documentPreviewFrame');
+    const title = document.getElementById('previewTitle');
+    
+    if (modal && frame) {
+      frame.src = fileData;
+      title.textContent = `Preview: ${fileName || `${type.toUpperCase()} Document`}`;
+      modal.classList.add('active');
+      
+      const downloadBtn = document.getElementById('downloadFromPreviewBtn');
+      if (downloadBtn) {
+        downloadBtn.onclick = () => downloadDocument(type);
+      }
+    }
+  } else {
+    showToast('No document to preview', 'error');
+  }
+}
+
+function downloadDocument(type) {
+  const fileData = type === 'cv' ? portfolioData.cvFile : portfolioData.resumeFile;
+  const fileName = type === 'cv' ? portfolioData.cvFileName : portfolioData.resumeFileName;
+  
+  if (fileData) {
+    downloadFile(fileData, fileName || `${type.toUpperCase()}.pdf`);
+    
+    if (type === 'cv') {
+      portfolioData.analytics.cvDownloads = (portfolioData.analytics.cvDownloads || 0) + 1;
+    } else {
+      portfolioData.analytics.resumeDownloads = (portfolioData.analytics.resumeDownloads || 0) + 1;
+    }
+    saveToStorage();
+    
+    showToast(`${type.toUpperCase()} download started`, 'success');
+  } else {
+    showToast('No document to download', 'error');
+  }
+}
+
+function replaceDocument(type) {
+  const fileInput = document.getElementById(`${type}Upload`);
+  if (fileInput) {
+    fileInput.click();
+  }
+}
+
+function deleteDocument(type) {
+  if (confirm(`Are you sure you want to delete your ${type.toUpperCase()}? This action cannot be undone.`)) {
+    if (type === 'cv') {
+      portfolioData.cvFile = null;
+      portfolioData.cvFileName = null;
+      portfolioData.cvFileSize = null;
+      portfolioData.cvUploadedAt = null;
+    } else {
+      portfolioData.resumeFile = null;
+      portfolioData.resumeFileName = null;
+      portfolioData.resumeFileSize = null;
+      portfolioData.resumeUploadedAt = null;
+    }
+    
+    saveToStorage();
+    resetDocumentUI(type);
+    showToast(`${type.toUpperCase()} deleted successfully`, 'success');
+    renderPortfolio();
+  }
+}
+
+function resetDocumentUI(type) {
+  const infoDiv = document.getElementById(`${type}FileInfo`);
+  const uploadArea = document.getElementById(`${type}UploadArea`);
+  const card = document.getElementById(`${type}UploadCard`);
+  const fileInput = document.getElementById(`${type}Upload`);
+  
+  if (infoDiv) {
+    infoDiv.classList.remove('active');
+    infoDiv.innerHTML = '';
+  }
+  
+  if (uploadArea) uploadArea.style.display = 'flex';
+  if (card) card.classList.remove('has-file');
+  if (fileInput) fileInput.value = '';
+}
+
+function loadExistingDocuments() {
+  if (portfolioData.cvFile && portfolioData.cvFileName) {
+    const fakeFile = {
+      name: portfolioData.cvFileName,
+      size: portfolioData.cvFileSize || 1024 * 1024,
+      type: 'application/pdf'
+    };
+    updateDocumentDisplay('cv', fakeFile);
+    
+    const uploadArea = document.getElementById('cvUploadArea');
+    if (uploadArea) uploadArea.style.display = 'none';
+  }
+  
+  if (portfolioData.resumeFile && portfolioData.resumeFileName) {
+    const fakeFile = {
+      name: portfolioData.resumeFileName,
+      size: portfolioData.resumeFileSize || 1024 * 1024,
+      type: 'application/pdf'
+    };
+    updateDocumentDisplay('resume', fakeFile);
+    
+    const uploadArea = document.getElementById('resumeUploadArea');
+    if (uploadArea) uploadArea.style.display = 'none';
+  }
+}
+
+function setupDocumentPreview() {
+  const modal = document.getElementById('documentPreviewModal');
+  const closeBtns = document.querySelectorAll('#closePreviewBtn, #closePreviewFooterBtn');
+  
+  closeBtns.forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', () => {
+        if (modal) modal.classList.remove('active');
+      });
+    }
+  });
+  
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+  }
+}
+
+function setupDocumentOptions() {
+  const cvToggle = document.getElementById('toggleCvOptions');
+  const resumeToggle = document.getElementById('toggleResumeOptions');
+  
+  if (cvToggle) {
+    cvToggle.addEventListener('click', () => {
+      console.log('CV options clicked');
+    });
+  }
+  
+  if (resumeToggle) {
+    resumeToggle.addEventListener('click', () => {
+      console.log('Resume options clicked');
+    });
+  }
+}
+
+function formatFileSize(bytes) {
+  if (!bytes) return 'Unknown size';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
 // ----- RENDER FORM FIELDS -----
 function renderFormFields() {
-  // Basic Info
   setValue('nameInput', portfolioData.name);
   setValue('titleInput', portfolioData.title);
   setValue('bioInput', portfolioData.about);
@@ -81,10 +441,8 @@ function renderFormFields() {
   setValue('emailInput', portfolioData.email);
   setValue('phoneInput', portfolioData.phone);
   
-  // Update image preview
   updateImagePreview();
   
-  // Skills
   const skillsContainer = document.getElementById('skillsContainer');
   if (skillsContainer) {
     skillsContainer.innerHTML = '';
@@ -94,7 +452,6 @@ function renderFormFields() {
     });
   }
   
-  // Certifications
   const certsContainer = document.getElementById('certsContainer');
   if (certsContainer) {
     certsContainer.innerHTML = '';
@@ -104,21 +461,8 @@ function renderFormFields() {
     });
   }
   
-  // Projects
   renderProjectsList();
-  
-  // Social Links
   renderSocialList();
-  
-  // File names display
-  if (portfolioData.cvFileName) {
-    const cvNameDiv = document.getElementById('cvFileName');
-    if (cvNameDiv) cvNameDiv.innerHTML = `<i class="fas fa-file-pdf"></i> ${portfolioData.cvFileName}`;
-  }
-  if (portfolioData.resumeFileName) {
-    const resumeNameDiv = document.getElementById('resumeFileName');
-    if (resumeNameDiv) resumeNameDiv.innerHTML = `<i class="fas fa-file-pdf"></i> ${portfolioData.resumeFileName}`;
-  }
 }
 
 function setValue(id, value) {
@@ -161,7 +505,6 @@ function renderProjectsList() {
     projectsContainer.appendChild(div);
   });
   
-  // Attach event listeners
   document.querySelectorAll('[data-project-title]').forEach(input => {
     input.addEventListener('input', (e) => {
       const idx = parseInt(input.dataset.projectTitle);
@@ -257,7 +600,6 @@ function renderSocialList() {
   });
 }
 
-// Debounced render for performance
 let renderTimeout;
 function debouncedRender() {
   clearTimeout(renderTimeout);
@@ -270,7 +612,6 @@ function renderPortfolio() {
   const previewDiv = document.getElementById('portfolioPreview');
   if (!previewDiv) return;
   
-  // Build social HTML
   let socialHtml = '';
   for (const [platform, url] of Object.entries(data.socialLinks || {})) {
     if (url && url !== '#') {
@@ -283,10 +624,8 @@ function renderPortfolio() {
     }
   }
   
-  // Skills HTML
   const skillsHtml = (data.skills || []).map(s => `<span class="skill-badge">${escapeHtml(s)}</span>`).join('');
   
-  // Projects HTML
   const projectsHtml = (data.projects || []).filter(p => p.name && p.name !== 'New Project').map(p => `
     <div class="project-card">
       <h4>${escapeHtml(p.name)}</h4>
@@ -295,15 +634,13 @@ function renderPortfolio() {
     </div>
   `).join('');
   
-  // Certifications HTML
   const certsHtml = (data.certifications || []).map(c => `<span class="cert-badge">${escapeHtml(c)}</span>`).join('');
   
-  // Documents HTML
   const cvPreview = data.cvFile ? `
     <div class="doc-card">
       <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
       <h4>Curriculum Vitae</h4>
-      <div class="doc-meta">PDF · Detailed experience</div>
+      <div class="doc-meta">PDF · ${data.cvFileName || 'Document'}</div>
       <button class="btn-primary download-cv-btn"><i class="fas fa-download"></i> Download CV</button>
       ${data.cvFile.startsWith('data:') ? `<div class="pdf-preview"><iframe src="${data.cvFile}" title="CV Preview"></iframe></div>` : ''}
     </div>
@@ -320,7 +657,7 @@ function renderPortfolio() {
     <div class="doc-card">
       <div class="doc-icon"><i class="fas fa-file-alt"></i></div>
       <h4>Professional Resume</h4>
-      <div class="doc-meta">PDF · One-page summary</div>
+      <div class="doc-meta">PDF · ${data.resumeFileName || 'Document'}</div>
       <button class="btn-primary download-resume-btn"><i class="fas fa-download"></i> Download Resume</button>
       ${data.resumeFile.startsWith('data:') ? `<div class="pdf-preview"><iframe src="${data.resumeFile}" title="Resume Preview"></iframe></div>` : ''}
     </div>
@@ -395,10 +732,8 @@ function renderPortfolio() {
     </div>
   `;
   
-  // Attach download handlers
   attachDownloadHandlers();
   
-  // WhatsApp button in summary
   const whatsappBtn = document.getElementById('whatsappSummaryBtn');
   if (whatsappBtn) {
     whatsappBtn.addEventListener('click', () => handleWhatsApp());
@@ -454,7 +789,6 @@ function handleWhatsApp() {
   }
 }
 
-// ----- TOAST NOTIFICATION -----
 function showToast(message, type = 'info') {
   const toast = document.getElementById('toast');
   if (!toast) return;
@@ -468,7 +802,6 @@ function showToast(message, type = 'info') {
   }, 3000);
 }
 
-// ----- SHARE FUNCTIONALITY -----
 function updateShareLink() {
   const shareLink = document.getElementById('shareLinkInput');
   if (shareLink) {
@@ -539,7 +872,6 @@ function shareOnPlatform(platform) {
 
 // ----- EVENT LISTENERS -----
 function bindEventListeners() {
-  // Input fields
   const nameInput = document.getElementById('nameInput');
   if (nameInput) nameInput.addEventListener('input', (e) => { portfolioData.name = e.target.value; saveToStorage(); debouncedRender(); updateImagePreview(); });
   
@@ -561,7 +893,6 @@ function bindEventListeners() {
   const phoneInput = document.getElementById('phoneInput');
   if (phoneInput) phoneInput.addEventListener('input', (e) => { portfolioData.phone = e.target.value; saveToStorage(); debouncedRender(); });
   
-  // Add Skill
   const addSkillBtn = document.getElementById('addSkillBtn');
   if (addSkillBtn) {
     addSkillBtn.addEventListener('click', () => {
@@ -578,7 +909,6 @@ function bindEventListeners() {
     });
   }
   
-  // Add Certification
   const addCertBtn = document.getElementById('addCertBtn');
   if (addCertBtn) {
     addCertBtn.addEventListener('click', () => {
@@ -595,7 +925,6 @@ function bindEventListeners() {
     });
   }
   
-  // Add Project
   const addProjectBtn = document.getElementById('addProjectBtn');
   if (addProjectBtn) {
     addProjectBtn.addEventListener('click', () => {
@@ -608,7 +937,6 @@ function bindEventListeners() {
     });
   }
   
-  // Add Social
   const addSocialBtn = document.getElementById('addSocialBtn');
   if (addSocialBtn) {
     addSocialBtn.addEventListener('click', () => {
@@ -621,7 +949,6 @@ function bindEventListeners() {
     });
   }
   
-  // Theme selection
   const themeSelect = document.getElementById('themeSelect');
   if (themeSelect) {
     themeSelect.addEventListener('change', (e) => {
@@ -635,7 +962,6 @@ function bindEventListeners() {
     });
   }
   
-  // Animation level
   const animationSelect = document.getElementById('animationSelect');
   if (animationSelect) {
     animationSelect.addEventListener('change', (e) => {
@@ -649,11 +975,9 @@ function bindEventListeners() {
     });
   }
   
-  // Layout selection
   const layoutSelect = document.getElementById('layoutSelect');
   if (layoutSelect) layoutSelect.addEventListener('change', () => renderPortfolio());
   
-  // Reset data
   const resetBtn = document.getElementById('resetDataBtn');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
@@ -665,7 +989,6 @@ function bindEventListeners() {
     });
   }
   
-  // Export config
   const exportBtn = document.getElementById('exportConfigBtn');
   if (exportBtn) {
     exportBtn.addEventListener('click', () => {
@@ -678,7 +1001,6 @@ function bindEventListeners() {
     });
   }
   
-  // Import config
   const importBtn = document.getElementById('importConfigBtn');
   const importFile = document.getElementById('importFileInput');
   if (importBtn && importFile) {
@@ -701,7 +1023,6 @@ function bindEventListeners() {
     });
   }
   
-  // Sticky buttons
   const stickyCvBtn = document.getElementById('stickyDownloadCV');
   if (stickyCvBtn) {
     stickyCvBtn.addEventListener('click', () => {
@@ -733,7 +1054,6 @@ function bindEventListeners() {
   const whatsappSticky = document.getElementById('whatsappStickyBtn');
   if (whatsappSticky) whatsappSticky.addEventListener('click', handleWhatsApp);
   
-  // Share
   const shareBtn = document.getElementById('sharePortfolioBtn');
   if (shareBtn) shareBtn.addEventListener('click', openShareModal);
   
@@ -745,7 +1065,6 @@ function bindEventListeners() {
     document.getElementById('shareModal')?.classList.remove('active');
   });
   
-  // Share buttons
   const shareWhatsApp = document.getElementById('shareWhatsApp');
   if (shareWhatsApp) shareWhatsApp.addEventListener('click', () => shareOnPlatform('whatsapp'));
   
@@ -755,7 +1074,6 @@ function bindEventListeners() {
   const shareTwitter = document.getElementById('shareTwitter');
   if (shareTwitter) shareTwitter.addEventListener('click', () => shareOnPlatform('twitter'));
   
-  // File uploads
   const profileUpload = document.getElementById('profileUpload');
   if (profileUpload) {
     profileUpload.addEventListener('change', async (e) => {
@@ -772,58 +1090,18 @@ function bindEventListeners() {
       }
     });
   }
-  
-  const cvUpload = document.getElementById('cvUpload');
-  if (cvUpload) {
-    cvUpload.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (file && file.type === 'application/pdf') {
-        const base64 = await fileToBase64(file);
-        portfolioData.cvFile = base64;
-        portfolioData.cvFileName = file.name;
-        saveToStorage();
-        renderFormFields();
-        renderPortfolio();
-        showToast('CV uploaded successfully', 'success');
-      } else if (file) {
-        showToast('Please upload a PDF file', 'error');
-      }
-    });
-  }
-  
-  const resumeUpload = document.getElementById('resumeUpload');
-  if (resumeUpload) {
-    resumeUpload.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (file && file.type === 'application/pdf') {
-        const base64 = await fileToBase64(file);
-        portfolioData.resumeFile = base64;
-        portfolioData.resumeFileName = file.name;
-        saveToStorage();
-        renderFormFields();
-        renderPortfolio();
-        showToast('Resume uploaded successfully', 'success');
-      } else if (file) {
-        showToast('Please upload a PDF file', 'error');
-      }
-    });
-  }
 }
 
-// ----- MOBILE INTERACTIONS (FIXED) -----
+// ----- MOBILE INTERACTIONS -----
 function setupMobileInteractions() {
   const sidebar = document.getElementById('editorSidebar');
   const openBtn = document.getElementById('openSidebarBtn');
   const closeBtn = document.getElementById('closeSidebarBtn');
   const overlay = document.getElementById('mobileOverlay');
   
-  console.log('Setting up mobile interactions...'); // Debug log
-  
-  // Open sidebar
   if (openBtn) {
     openBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      console.log('Open button clicked'); // Debug log
       if (sidebar) {
         sidebar.classList.add('active');
         if (overlay) overlay.classList.add('active');
@@ -832,7 +1110,6 @@ function setupMobileInteractions() {
     });
   }
   
-  // Close sidebar function
   const closeSidebar = () => {
     if (sidebar) {
       sidebar.classList.remove('active');
@@ -841,24 +1118,15 @@ function setupMobileInteractions() {
     }
   };
   
-  // Close button
-  if (closeBtn) {
-    closeBtn.addEventListener('click', closeSidebar);
-  }
+  if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+  if (overlay) overlay.addEventListener('click', closeSidebar);
   
-  // Overlay click
-  if (overlay) {
-    overlay.addEventListener('click', closeSidebar);
-  }
-  
-  // Close on escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && sidebar && sidebar.classList.contains('active')) {
       closeSidebar();
     }
   });
   
-  // Close modal on outside click
   const modal = document.getElementById('shareModal');
   if (modal) {
     modal.addEventListener('click', (e) => {
@@ -868,7 +1136,6 @@ function setupMobileInteractions() {
     });
   }
   
-  // Handle window resize - close sidebar on resize to desktop
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
@@ -892,13 +1159,11 @@ function loadThemePreference() {
   const themeSelect = document.getElementById('themeSelect');
   if (themeSelect) themeSelect.value = savedTheme || 'default';
   
-  // Dark mode
   const savedDarkMode = localStorage.getItem('darkMode');
   if (savedDarkMode === 'true') {
     document.documentElement.setAttribute('data-theme', 'dark');
   }
   
-  // Animation level
   const savedAnimation = localStorage.getItem('animationLevel');
   if (savedAnimation) {
     animationLevel = savedAnimation;
@@ -919,7 +1184,6 @@ function checkReducedMotion() {
   }
 }
 
-// Dark mode setup
 function setupDarkMode() {
   const darkBtn = document.getElementById('darkModeToggle');
   if (darkBtn) {
@@ -932,13 +1196,11 @@ function setupDarkMode() {
       showToast(`${isDark ? 'Light' : 'Dark'} mode activated`, 'success');
     });
     
-    // Set initial icon
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     darkBtn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
   }
 }
 
-// Skill input keypress handler
 function handleSkillKeyPress(event) {
   if (event.key === 'Enter') {
     event.preventDefault();
@@ -947,13 +1209,9 @@ function handleSkillKeyPress(event) {
   }
 }
 
-// Make function global for HTML onkeypress
 window.handleSkillKeyPress = handleSkillKeyPress;
-
-// Initialize dark mode
 setTimeout(setupDarkMode, 100);
 
-// ----- UTILITIES -----
 function escapeHtml(str) {
   if (!str) return '';
   return str
