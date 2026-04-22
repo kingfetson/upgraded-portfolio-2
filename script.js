@@ -1,27 +1,30 @@
 // ============================================
-// CAREER PORTFOLIO GENERATOR - MAIN SCRIPT
+// CAREER PORTFOLIO GENERATOR - ENHANCED SCRIPT
+// Mobile Responsive, Performance Optimized
 // ============================================
 
 // ----- STATE MANAGEMENT -----
 let portfolioData = null;
 let currentFileUrls = { cv: null, resume: null };
+let animationLevel = 'full';
 
 // ----- INITIALIZATION -----
 document.addEventListener('DOMContentLoaded', () => {
   initializeApp();
   bindEventListeners();
   loadThemePreference();
+  setupMobileInteractions();
+  checkReducedMotion();
 });
 
 function initializeApp() {
   loadFromStorage();
   if (!portfolioData) {
-    // Use config.js as fallback
     portfolioData = { ...window.PORTFOLIO_CONFIG };
   }
   renderFormFields();
   renderPortfolio();
-  setupFileURLs();
+  updateShareLink();
 }
 
 // ----- LOCALSTORAGE MANAGEMENT -----
@@ -31,7 +34,6 @@ function loadFromStorage() {
     try {
       const parsed = JSON.parse(saved);
       portfolioData = { ...window.PORTFOLIO_CONFIG, ...parsed };
-      // Increment view count
       portfolioData.analytics = portfolioData.analytics || { views: 0, cvDownloads: 0, resumeDownloads: 0 };
       portfolioData.analytics.views = (portfolioData.analytics.views || 0) + 1;
       saveToStorage();
@@ -60,41 +62,79 @@ function fileToBase64(file) {
   });
 }
 
-async function setupFileURLs() {
-  if (portfolioData.cvFile && portfolioData.cvFile.startsWith('data:')) {
-    // Already base64
-  }
-}
-
 // ----- RENDER FORM FIELDS -----
 function renderFormFields() {
   // Basic Info
-  document.getElementById('nameInput').value = portfolioData.name || '';
-  document.getElementById('titleInput').value = portfolioData.title || '';
-  document.getElementById('bioInput').value = portfolioData.about || '';
-  document.getElementById('imageUrlInput').value = portfolioData.profileImage || '';
-  document.getElementById('locationInput').value = portfolioData.location || '';
-  document.getElementById('emailInput').value = portfolioData.email || '';
-  document.getElementById('phoneInput').value = portfolioData.phone || '';
+  setValue('nameInput', portfolioData.name);
+  setValue('titleInput', portfolioData.title);
+  setValue('bioInput', portfolioData.about);
+  setValue('imageUrlInput', portfolioData.profileImage);
+  setValue('locationInput', portfolioData.location);
+  setValue('emailInput', portfolioData.email);
+  setValue('phoneInput', portfolioData.phone);
   
   // Skills
   const skillsContainer = document.getElementById('skillsContainer');
-  skillsContainer.innerHTML = '';
-  (portfolioData.skills || []).forEach((skill, idx) => {
-    const tag = document.createElement('div');
-    tag.className = 'skill-tag';
-    tag.innerHTML = `${escapeHtml(skill)} <i class="fas fa-times" data-skill="${idx}"></i>`;
-    tag.querySelector('i').addEventListener('click', () => {
-      portfolioData.skills.splice(idx, 1);
-      saveToStorage();
-      renderFormFields();
-      renderPortfolio();
+  if (skillsContainer) {
+    skillsContainer.innerHTML = '';
+    (portfolioData.skills || []).forEach((skill, idx) => {
+      const tag = createTagElement(skill, idx, 'skill');
+      skillsContainer.appendChild(tag);
     });
-    skillsContainer.appendChild(tag);
-  });
+  }
+  
+  // Certifications
+  const certsContainer = document.getElementById('certsContainer');
+  if (certsContainer) {
+    certsContainer.innerHTML = '';
+    (portfolioData.certifications || []).forEach((cert, idx) => {
+      const tag = createTagElement(cert, idx, 'cert');
+      certsContainer.appendChild(tag);
+    });
+  }
   
   // Projects
+  renderProjectsList();
+  
+  // Social Links
+  renderSocialList();
+  
+  // File names display
+  if (portfolioData.cvFileName) {
+    document.getElementById('cvFileName').innerHTML = `<i class="fas fa-file-pdf"></i> ${portfolioData.cvFileName}`;
+  }
+  if (portfolioData.resumeFileName) {
+    document.getElementById('resumeFileName').innerHTML = `<i class="fas fa-file-pdf"></i> ${portfolioData.resumeFileName}`;
+  }
+}
+
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value || '';
+}
+
+function createTagElement(text, idx, type) {
+  const tag = document.createElement('div');
+  tag.className = type === 'skill' ? 'skill-tag' : 'cert-tag';
+  tag.innerHTML = `${escapeHtml(text)} <i class="fas fa-times" data-${type}-idx="${idx}"></i>`;
+  tag.querySelector('i').addEventListener('click', () => {
+    if (type === 'skill') {
+      portfolioData.skills.splice(idx, 1);
+    } else {
+      portfolioData.certifications.splice(idx, 1);
+    }
+    saveToStorage();
+    renderFormFields();
+    renderPortfolio();
+    showToast(`${type} removed`, 'info');
+  });
+  return tag;
+}
+
+function renderProjectsList() {
   const projectsContainer = document.getElementById('projectsList');
+  if (!projectsContainer) return;
+  
   projectsContainer.innerHTML = '';
   (portfolioData.projects || []).forEach((project, idx) => {
     const div = document.createElement('div');
@@ -108,13 +148,13 @@ function renderFormFields() {
     projectsContainer.appendChild(div);
   });
   
-  // Attach project event listeners
+  // Attach event listeners
   document.querySelectorAll('[data-project-title]').forEach(input => {
     input.addEventListener('input', (e) => {
       const idx = parseInt(input.dataset.projectTitle);
       portfolioData.projects[idx].name = input.value;
       saveToStorage();
-      renderPortfolio();
+      debouncedRender();
     });
   });
   document.querySelectorAll('[data-project-desc]').forEach(textarea => {
@@ -122,7 +162,7 @@ function renderFormFields() {
       const idx = parseInt(textarea.dataset.projectDesc);
       portfolioData.projects[idx].description = textarea.value;
       saveToStorage();
-      renderPortfolio();
+      debouncedRender();
     });
   });
   document.querySelectorAll('[data-project-link]').forEach(input => {
@@ -130,7 +170,7 @@ function renderFormFields() {
       const idx = parseInt(input.dataset.projectLink);
       portfolioData.projects[idx].link = input.value;
       saveToStorage();
-      renderPortfolio();
+      debouncedRender();
     });
   });
   document.querySelectorAll('.remove-project').forEach(btn => {
@@ -140,11 +180,15 @@ function renderFormFields() {
       saveToStorage();
       renderFormFields();
       renderPortfolio();
+      showToast('Project removed', 'info');
     });
   });
-  
-  // Social Links
+}
+
+function renderSocialList() {
   const socialContainer = document.getElementById('socialList');
+  if (!socialContainer) return;
+  
   socialContainer.innerHTML = '';
   const socialEntries = Object.entries(portfolioData.socialLinks || {});
   socialEntries.forEach(([platform, url], idx) => {
@@ -184,7 +228,7 @@ function renderFormFields() {
       const key = Object.keys(portfolioData.socialLinks)[idx];
       portfolioData.socialLinks[key] = input.value;
       saveToStorage();
-      renderPortfolio();
+      debouncedRender();
     });
   });
   document.querySelectorAll('.remove-social').forEach(btn => {
@@ -195,23 +239,23 @@ function renderFormFields() {
       saveToStorage();
       renderFormFields();
       renderPortfolio();
+      showToast('Social link removed', 'info');
     });
   });
-  
-  // File names display
-  if (portfolioData.cvFileName) {
-    document.getElementById('cvFileName').innerHTML = `📄 ${portfolioData.cvFileName}`;
-  }
-  if (portfolioData.resumeFileName) {
-    document.getElementById('resumeFileName').innerHTML = `📄 ${portfolioData.resumeFileName}`;
-  }
+}
+
+// Debounced render for performance
+let renderTimeout;
+function debouncedRender() {
+  clearTimeout(renderTimeout);
+  renderTimeout = setTimeout(() => renderPortfolio(), 100);
 }
 
 // ----- RENDER PORTFOLIO PREVIEW -----
 function renderPortfolio() {
   const data = portfolioData;
-  const layout = document.getElementById('layoutSelect').value;
   const previewDiv = document.getElementById('portfolioPreview');
+  if (!previewDiv) return;
   
   // Build social HTML
   let socialHtml = '';
@@ -222,7 +266,7 @@ function renderPortfolio() {
       else if (platform === 'github') icon = 'fab fa-github';
       else if (platform === 'twitter') icon = 'fab fa-twitter';
       else if (platform === 'dribbble') icon = 'fab fa-dribbble';
-      socialHtml += `<a href="${url}" target="_blank"><i class="${icon} fa-lg"></i></a>`;
+      socialHtml += `<a href="${url}" target="_blank" aria-label="${platform}"><i class="${icon}"></i></a>`;
     }
   }
   
@@ -249,7 +293,7 @@ function renderPortfolio() {
       <h4>Curriculum Vitae</h4>
       <div class="doc-meta">PDF · Detailed experience</div>
       <button class="btn-primary download-cv-btn"><i class="fas fa-download"></i> Download CV</button>
-      ${data.cvFile.startsWith('data:') ? `<div class="pdf-preview"><iframe src="${data.cvFile}" width="100%" height="200px"></iframe></div>` : ''}
+      ${data.cvFile.startsWith('data:') ? `<div class="pdf-preview"><iframe src="${data.cvFile}" title="CV Preview" width="100%" height="180px"></iframe></div>` : ''}
     </div>
   ` : `
     <div class="doc-card">
@@ -266,7 +310,7 @@ function renderPortfolio() {
       <h4>Professional Resume</h4>
       <div class="doc-meta">PDF · One-page summary</div>
       <button class="btn-primary download-resume-btn"><i class="fas fa-download"></i> Download Resume</button>
-      ${data.resumeFile.startsWith('data:') ? `<div class="pdf-preview"><iframe src="${data.resumeFile}" width="100%" height="200px"></iframe></div>` : ''}
+      ${data.resumeFile.startsWith('data:') ? `<div class="pdf-preview"><iframe src="${data.resumeFile}" title="Resume Preview" width="100%" height="180px"></iframe></div>` : ''}
     </div>
   ` : `
     <div class="doc-card">
@@ -277,10 +321,12 @@ function renderPortfolio() {
     </div>
   `;
   
-  // Final HTML
+  // Apply animation class based on settings
+  const animationClass = animationLevel === 'none' ? 'no-animation' : '';
+  
   previewDiv.innerHTML = `
-    <div class="hero-section">
-      <img src="${data.profileImage || 'https://via.placeholder.com/140'}" class="profile-img-large" onerror="this.src='https://via.placeholder.com/140'">
+    <div class="hero-section ${animationClass}">
+      <img src="${data.profileImage || 'https://via.placeholder.com/120'}" class="profile-img-large" onerror="this.src='https://via.placeholder.com/120'" alt="${escapeHtml(data.name)}">
       <h1>${escapeHtml(data.name)}</h1>
       <div class="hero-title">${escapeHtml(data.title)}</div>
       <div class="location-email">
@@ -339,6 +385,16 @@ function renderPortfolio() {
   `;
   
   // Attach download handlers
+  attachDownloadHandlers();
+  
+  // WhatsApp button in summary
+  const whatsappBtn = document.getElementById('whatsappSummaryBtn');
+  if (whatsappBtn) {
+    whatsappBtn.addEventListener('click', () => handleWhatsApp());
+  }
+}
+
+function attachDownloadHandlers() {
   document.querySelectorAll('.download-cv-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       if (portfolioData.cvFile) {
@@ -346,8 +402,9 @@ function renderPortfolio() {
         portfolioData.analytics.cvDownloads = (portfolioData.analytics.cvDownloads || 0) + 1;
         saveToStorage();
         renderPortfolio();
+        showToast('CV download started', 'success');
       } else {
-        alert('CV file not uploaded yet');
+        showToast('CV file not uploaded yet', 'error');
       }
     });
   });
@@ -359,25 +416,12 @@ function renderPortfolio() {
         portfolioData.analytics.resumeDownloads = (portfolioData.analytics.resumeDownloads || 0) + 1;
         saveToStorage();
         renderPortfolio();
+        showToast('Resume download started', 'success');
       } else {
-        alert('Resume file not uploaded yet');
+        showToast('Resume file not uploaded yet', 'error');
       }
     });
   });
-  
-  // WhatsApp button in summary
-  const whatsappBtn = document.getElementById('whatsappSummaryBtn');
-  if (whatsappBtn) {
-    whatsappBtn.addEventListener('click', () => {
-      const phone = portfolioData.phone?.replace(/\D/g, '') || '';
-      if (phone) {
-        const msg = `Hello ${portfolioData.name}, I saw your portfolio and I'm interested in connecting!`;
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-      } else {
-        alert('WhatsApp number not provided in contact info');
-      }
-    });
-  }
 }
 
 function downloadFile(dataUrl, filename) {
@@ -389,226 +433,441 @@ function downloadFile(dataUrl, filename) {
   document.body.removeChild(link);
 }
 
+function handleWhatsApp() {
+  const phone = portfolioData.phone?.replace(/\D/g, '') || '';
+  if (phone) {
+    const msg = `Hello ${portfolioData.name}, I saw your portfolio and I'm interested in connecting!`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+  } else {
+    showToast('WhatsApp number not provided in contact info', 'error');
+  }
+}
+
+// ----- TOAST NOTIFICATION -----
+function showToast(message, type = 'info') {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  
+  toast.textContent = message;
+  toast.style.borderLeftColor = type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--primary)';
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+// ----- SHARE FUNCTIONALITY -----
+function updateShareLink() {
+  const shareLink = document.getElementById('shareLinkInput');
+  if (shareLink) {
+    shareLink.value = window.location.href;
+  }
+}
+
+function copyToClipboard() {
+  const shareLink = document.getElementById('shareLinkInput');
+  if (shareLink) {
+    shareLink.select();
+    document.execCommand('copy');
+    showToast('Link copied to clipboard!', 'success');
+  }
+}
+
+function openShareModal() {
+  const modal = document.getElementById('shareModal');
+  if (modal) {
+    modal.classList.add('active');
+    updateShareLink();
+    generateQRCode();
+  }
+}
+
+function generateQRCode() {
+  const qrContainer = document.getElementById('qrCodeContainer');
+  if (!qrContainer) return;
+  
+  qrContainer.innerHTML = '';
+  const url = window.location.href;
+  
+  // Simple QR code using canvas (fallback if QRCode library not available)
+  const canvas = document.createElement('canvas');
+  canvas.width = 150;
+  canvas.height = 150;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, 150, 150);
+  ctx.fillStyle = '#000000';
+  ctx.font = '12px Arial';
+  ctx.fillText('📱 Scan me', 45, 75);
+  ctx.fillText('⬇️', 70, 95);
+  qrContainer.appendChild(canvas);
+}
+
 // ----- EVENT LISTENERS -----
 function bindEventListeners() {
   // Input fields
-  document.getElementById('nameInput').addEventListener('input', (e) => {
-    portfolioData.name = e.target.value;
-    saveToStorage();
-    renderPortfolio();
-  });
-  document.getElementById('titleInput').addEventListener('input', (e) => {
-    portfolioData.title = e.target.value;
-    saveToStorage();
-    renderPortfolio();
-  });
-  document.getElementById('bioInput').addEventListener('input', (e) => {
-    portfolioData.about = e.target.value;
-    saveToStorage();
-    renderPortfolio();
-  });
-  document.getElementById('imageUrlInput').addEventListener('input', (e) => {
-    portfolioData.profileImage = e.target.value;
-    saveToStorage();
-    renderPortfolio();
-  });
-  document.getElementById('locationInput').addEventListener('input', (e) => {
-    portfolioData.location = e.target.value;
-    saveToStorage();
-    renderPortfolio();
-  });
-  document.getElementById('emailInput').addEventListener('input', (e) => {
-    portfolioData.email = e.target.value;
-    saveToStorage();
-    renderPortfolio();
-  });
-  document.getElementById('phoneInput').addEventListener('input', (e) => {
-    portfolioData.phone = e.target.value;
-    saveToStorage();
-    renderPortfolio();
+  const inputIds = ['nameInput', 'titleInput', 'bioInput', 'imageUrlInput', 'locationInput', 'emailInput', 'phoneInput'];
+  inputIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', (e) => {
+        const key = id.replace('Input', '').toLowerCase();
+        if (key === 'bio') portfolioData.about = e.target.value;
+        else if (key === 'imageurl') portfolioData.profileImage = e.target.value;
+        else portfolioData[key] = e.target.value;
+        saveToStorage();
+        debouncedRender();
+      });
+    }
   });
   
   // Add Skill
-  document.getElementById('addSkillBtn').addEventListener('click', () => {
-    const input = document.getElementById('skillInput');
-    if (input.value.trim()) {
-      portfolioData.skills = portfolioData.skills || [];
-      portfolioData.skills.push(input.value.trim());
-      saveToStorage();
-      renderFormFields();
-      renderPortfolio();
-      input.value = '';
-    }
-  });
-  
-  // Add Project
-  document.getElementById('addProjectBtn').addEventListener('click', () => {
-    portfolioData.projects = portfolioData.projects || [];
-    portfolioData.projects.push({ name: 'New Project', description: 'Project description here', link: '#' });
-    saveToStorage();
-    renderFormFields();
-    renderPortfolio();
-  });
-  
-  // Add Social
-  document.getElementById('addSocialBtn').addEventListener('click', () => {
-    portfolioData.socialLinks = portfolioData.socialLinks || {};
-    portfolioData.socialLinks['linkedin'] = 'https://linkedin.com/in/username';
-    saveToStorage();
-    renderFormFields();
-    renderPortfolio();
-  });
-  
-  // Theme selection
-  document.getElementById('themeSelect').addEventListener('change', (e) => {
-    const theme = e.target.value;
-    document.body.classList.remove('theme-modern', 'theme-creative', 'theme-minimal');
-    if (theme === 'modern') document.body.classList.add('theme-modern');
-    else if (theme === 'creative') document.body.classList.add('theme-creative');
-    else if (theme === 'minimal') document.body.classList.add('theme-minimal');
-    localStorage.setItem('selectedTheme', theme);
-  });
-  
-  // Layout selection
-  document.getElementById('layoutSelect').addEventListener('change', () => renderPortfolio());
-  
-  // Reset data
-  document.getElementById('resetDataBtn').addEventListener('click', () => {
-    if (confirm('Are you sure? This will delete all your custom data and restore the default config.')) {
-      localStorage.removeItem('career_portfolio_data');
-      location.reload();
-    }
-  });
-  
-  // Export config
-  document.getElementById('exportConfigBtn').addEventListener('click', () => {
-    const dataStr = JSON.stringify(portfolioData, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    downloadFile(url, 'portfolio-config.json');
-    URL.revokeObjectURL(url);
-  });
-  
-  // Sticky download CV
-  document.getElementById('stickyDownloadCV').addEventListener('click', () => {
-    if (portfolioData.cvFile) {
-      downloadFile(portfolioData.cvFile, 'CV.pdf');
-      portfolioData.analytics.cvDownloads = (portfolioData.analytics.cvDownloads || 0) + 1;
-      saveToStorage();
-      renderPortfolio();
-    } else {
-      alert('CV not uploaded yet');
-    }
-  });
-  
-  // Sticky WhatsApp
-  document.getElementById('whatsappStickyBtn').addEventListener('click', () => {
-    const phone = portfolioData.phone?.replace(/\D/g, '') || '';
-    if (phone) {
-      const msg = `Hello ${portfolioData.name}, I saw your portfolio and I'm interested!`;
-      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-    } else {
-      alert('WhatsApp number not provided');
-    }
-  });
-  
-  // File uploads
-  document.getElementById('profileUpload').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const base64 = await fileToBase64(file);
-      portfolioData.profileImage = base64;
-      saveToStorage();
-      renderPortfolio();
-    }
-  });
-  
-  document.getElementById('cvUpload').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (file && file.type === 'application/pdf') {
-      const base64 = await fileToBase64(file);
-      portfolioData.cvFile = base64;
-      portfolioData.cvFileName = file.name;
-      saveToStorage();
-      renderFormFields();
-      renderPortfolio();
-    } else {
-      alert('Please upload a PDF file');
-    }
-  });
-  
-  document.getElementById('resumeUpload').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (file && file.type === 'application/pdf') {
-      const base64 = await fileToBase64(file);
-      portfolioData.resumeFile = base64;
-      portfolioData.resumeFileName = file.name;
-      saveToStorage();
-      renderFormFields();
-      renderPortfolio();
-    } else {
-      alert('Please upload a PDF file');
-    }
-  });
-  
-  // Mobile sidebar toggle
-  const toggleBtn = document.getElementById('toggleSidebar');
-  const sidebar = document.getElementById('editorSidebar');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('collapsed');
+  const addSkillBtn = document.getElementById('addSkillBtn');
+  if (addSkillBtn) {
+    addSkillBtn.addEventListener('click', () => {
+      const input = document.getElementById('skillInput');
+      if (input && input.value.trim()) {
+        portfolioData.skills = portfolioData.skills || [];
+        portfolioData.skills.push(input.value.trim());
+        saveToStorage();
+        renderFormFields();
+        renderPortfolio();
+        input.value = '';
+        showToast('Skill added', 'success');
+      }
     });
   }
   
-  document.getElementById('toggleSidebarMobile')?.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
+  // Add Certification
+  const addCertBtn = document.getElementById('addCertBtn');
+  if (addCertBtn) {
+    addCertBtn.addEventListener('click', () => {
+      const input = document.getElementById('certInput');
+      if (input && input.value.trim()) {
+        portfolioData.certifications = portfolioData.certifications || [];
+        portfolioData.certifications.push(input.value.trim());
+        saveToStorage();
+        renderFormFields();
+        renderPortfolio();
+        input.value = '';
+        showToast('Certification added', 'success');
+      }
+    });
+  }
+  
+  // Add Project
+  const addProjectBtn = document.getElementById('addProjectBtn');
+  if (addProjectBtn) {
+    addProjectBtn.addEventListener('click', () => {
+      portfolioData.projects = portfolioData.projects || [];
+      portfolioData.projects.push({ name: 'New Project', description: 'Project description here', link: '#' });
+      saveToStorage();
+      renderFormFields();
+      renderPortfolio();
+      showToast('New project added', 'success');
+    });
+  }
+  
+  // Add Social
+  const addSocialBtn = document.getElementById('addSocialBtn');
+  if (addSocialBtn) {
+    addSocialBtn.addEventListener('click', () => {
+      portfolioData.socialLinks = portfolioData.socialLinks || {};
+      portfolioData.socialLinks['linkedin'] = 'https://linkedin.com/in/username';
+      saveToStorage();
+      renderFormFields();
+      renderPortfolio();
+      showToast('Social link added', 'success');
+    });
+  }
+  
+  // Theme selection
+  const themeSelect = document.getElementById('themeSelect');
+  if (themeSelect) {
+    themeSelect.addEventListener('change', (e) => {
+      const theme = e.target.value;
+      document.body.classList.remove('theme-modern', 'theme-creative', 'theme-minimal');
+      if (theme === 'modern') document.body.classList.add('theme-modern');
+      else if (theme === 'creative') document.body.classList.add('theme-creative');
+      else if (theme === 'minimal') document.body.classList.add('theme-minimal');
+      localStorage.setItem('selectedTheme', theme);
+      showToast(`Theme changed to ${theme}`, 'success');
+    });
+  }
+  
+  // Animation level
+  const animationSelect = document.getElementById('animationSelect');
+  if (animationSelect) {
+    animationSelect.addEventListener('change', (e) => {
+      animationLevel = e.target.value;
+      localStorage.setItem('animationLevel', animationLevel);
+      if (animationLevel === 'none') {
+        document.body.classList.add('no-animation');
+      } else {
+        document.body.classList.remove('no-animation');
+      }
+    });
+  }
+  
+  // Layout selection
+  const layoutSelect = document.getElementById('layoutSelect');
+  if (layoutSelect) {
+    layoutSelect.addEventListener('change', () => renderPortfolio());
+  }
+  
+  // Reset data
+  const resetBtn = document.getElementById('resetDataBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (confirm('⚠️ Are you sure? This will delete ALL your custom data and restore the default configuration. This action cannot be undone.')) {
+        localStorage.removeItem('career_portfolio_data');
+        showToast('Data reset. Refreshing...', 'success');
+        setTimeout(() => location.reload(), 1000);
+      }
+    });
+  }
+  
+  // Export config
+  const exportBtn = document.getElementById('exportConfigBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      const dataStr = JSON.stringify(portfolioData, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      downloadFile(url, `portfolio-${portfolioData.name?.replace(/\s/g, '-') || 'config'}.json`);
+      URL.revokeObjectURL(url);
+      showToast('Config exported successfully', 'success');
+    });
+  }
+  
+  // Import config
+  const importBtn = document.getElementById('importConfigBtn');
+  const importFile = document.getElementById('importFileInput');
+  if (importBtn && importFile) {
+    importBtn.addEventListener('click', () => importFile.click());
+    importFile.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const text = await file.text();
+        try {
+          const imported = JSON.parse(text);
+          portfolioData = { ...portfolioData, ...imported };
+          saveToStorage();
+          renderFormFields();
+          renderPortfolio();
+          showToast('Config imported successfully!', 'success');
+        } catch (err) {
+          showToast('Invalid config file', 'error');
+        }
+      }
+    });
+  }
+  
+  // Sticky buttons
+  const stickyCvBtn = document.getElementById('stickyDownloadCV');
+  if (stickyCvBtn) {
+    stickyCvBtn.addEventListener('click', () => {
+      if (portfolioData.cvFile) {
+        downloadFile(portfolioData.cvFile, 'CV.pdf');
+        portfolioData.analytics.cvDownloads = (portfolioData.analytics.cvDownloads || 0) + 1;
+        saveToStorage();
+        showToast('CV download started', 'success');
+      } else {
+        showToast('CV not uploaded yet', 'error');
+      }
+    });
+  }
+  
+  const stickyResumeBtn = document.getElementById('stickyDownloadResume');
+  if (stickyResumeBtn) {
+    stickyResumeBtn.addEventListener('click', () => {
+      if (portfolioData.resumeFile) {
+        downloadFile(portfolioData.resumeFile, 'Resume.pdf');
+        portfolioData.analytics.resumeDownloads = (portfolioData.analytics.resumeDownloads || 0) + 1;
+        saveToStorage();
+        showToast('Resume download started', 'success');
+      } else {
+        showToast('Resume not uploaded yet', 'error');
+      }
+    });
+  }
+  
+  const whatsappSticky = document.getElementById('whatsappStickyBtn');
+  if (whatsappSticky) whatsappSticky.addEventListener('click', handleWhatsApp);
+  
+  // Share
+  const shareBtn = document.getElementById('sharePortfolioBtn');
+  if (shareBtn) shareBtn.addEventListener('click', openShareModal);
+  
+  const copyLinkBtn = document.getElementById('copyLinkBtn');
+  if (copyLinkBtn) copyLinkBtn.addEventListener('click', copyToClipboard);
+  
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  if (closeModalBtn) closeModalBtn.addEventListener('click', () => {
+    document.getElementById('shareModal')?.classList.remove('active');
   });
+  
+  // File uploads
+  const profileUpload = document.getElementById('profileUpload');
+  if (profileUpload) {
+    profileUpload.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const base64 = await fileToBase64(file);
+        portfolioData.profileImage = base64;
+        saveToStorage();
+        renderPortfolio();
+        showToast('Profile image updated', 'success');
+      }
+    });
+  }
+  
+  const cvUpload = document.getElementById('cvUpload');
+  if (cvUpload) {
+    cvUpload.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file && file.type === 'application/pdf') {
+        const base64 = await fileToBase64(file);
+        portfolioData.cvFile = base64;
+        portfolioData.cvFileName = file.name;
+        saveToStorage();
+        renderFormFields();
+        renderPortfolio();
+        showToast('CV uploaded successfully', 'success');
+      } else {
+        showToast('Please upload a PDF file', 'error');
+      }
+    });
+  }
+  
+  const resumeUpload = document.getElementById('resumeUpload');
+  if (resumeUpload) {
+    resumeUpload.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file && file.type === 'application/pdf') {
+        const base64 = await fileToBase64(file);
+        portfolioData.resumeFile = base64;
+        portfolioData.resumeFileName = file.name;
+        saveToStorage();
+        renderFormFields();
+        renderPortfolio();
+        showToast('Resume uploaded successfully', 'success');
+      } else {
+        showToast('Please upload a PDF file', 'error');
+      }
+    });
+  }
 }
 
-// ----- THEME -----
+// ----- MOBILE INTERACTIONS -----
+function setupMobileInteractions() {
+  const sidebar = document.getElementById('editorSidebar');
+  const openBtn = document.getElementById('openSidebarBtn');
+  const closeBtn = document.getElementById('closeSidebarBtn');
+  const overlay = document.getElementById('mobileOverlay');
+  
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      sidebar?.classList.add('active');
+      overlay?.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+  }
+  
+  const closeSidebar = () => {
+    sidebar?.classList.remove('active');
+    overlay?.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+  
+  if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+  if (overlay) overlay.addEventListener('click', closeSidebar);
+  
+  // Close sidebar on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar?.classList.contains('active')) {
+      closeSidebar();
+    }
+  });
+  
+  // Click outside modal to close
+  const modal = document.getElementById('shareModal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+  }
+}
+
+// ----- THEME & PREFERENCES -----
 function loadThemePreference() {
   const savedTheme = localStorage.getItem('selectedTheme');
   if (savedTheme === 'modern') document.body.classList.add('theme-modern');
   else if (savedTheme === 'creative') document.body.classList.add('theme-creative');
   else if (savedTheme === 'minimal') document.body.classList.add('theme-minimal');
-  document.getElementById('themeSelect').value = savedTheme || 'default';
   
-  // Dark mode toggle from localStorage
-  const darkMode = localStorage.getItem('darkMode');
-  if (darkMode === 'true') {
+  const themeSelect = document.getElementById('themeSelect');
+  if (themeSelect) themeSelect.value = savedTheme || 'default';
+  
+  // Dark mode
+  const savedDarkMode = localStorage.getItem('darkMode');
+  if (savedDarkMode === 'true') {
     document.documentElement.setAttribute('data-theme', 'dark');
+  }
+  
+  // Animation level
+  const savedAnimation = localStorage.getItem('animationLevel');
+  if (savedAnimation) {
+    animationLevel = savedAnimation;
+    const animSelect = document.getElementById('animationSelect');
+    if (animSelect) animSelect.value = savedAnimation;
+    if (savedAnimation === 'none') {
+      document.body.classList.add('no-animation');
+    }
   }
 }
 
-// ----- UTILITIES -----
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  });
+function checkReducedMotion() {
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (mediaQuery.matches && animationLevel !== 'none') {
+    animationLevel = 'reduced';
+    const animSelect = document.getElementById('animationSelect');
+    if (animSelect) animSelect.value = 'reduced';
+  }
 }
 
-// Add dark mode toggle button dynamically
-function addDarkModeToggle() {
-  const toolbar = document.querySelector('.sticky-toolbar');
-  if (toolbar) {
-    const darkBtn = document.createElement('button');
-    darkBtn.className = 'btn-outline';
-    darkBtn.innerHTML = '<i class="fas fa-moon"></i>';
-    darkBtn.id = 'darkModeToggle';
+// Dark mode toggle
+function setupDarkMode() {
+  const darkBtn = document.getElementById('darkModeToggle');
+  if (darkBtn) {
     darkBtn.addEventListener('click', () => {
       const html = document.documentElement;
       const isDark = html.getAttribute('data-theme') === 'dark';
       html.setAttribute('data-theme', isDark ? 'light' : 'dark');
       localStorage.setItem('darkMode', !isDark);
       darkBtn.innerHTML = isDark ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+      showToast(`${isDark ? 'Light' : 'Dark'} mode activated`, 'success');
     });
-    toolbar.appendChild(darkBtn);
+    
+    // Set initial icon
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    darkBtn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
   }
 }
 
-// Call after DOM ready
-setTimeout(addDarkModeToggle, 100);
+// Skill input keypress handler
+function handleSkillKeyPress(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    document.getElementById('addSkillBtn')?.click();
+  }
+}
+
+// Make function global for HTML onkeypress
+window.handleSkillKeyPress = handleSkillKeyPress;
+
+// Initialize dark mode after DOM
+setTimeout(setupDarkMode, 100);
