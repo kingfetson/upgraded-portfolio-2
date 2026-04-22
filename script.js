@@ -1,11 +1,10 @@
 // ============================================
-// CAREER PORTFOLIO GENERATOR - ENHANCED SCRIPT
-// Mobile Responsive, Performance Optimized
+// CAREER PORTFOLIO GENERATOR - COMPLETE SCRIPT
+// Fixed Mobile Menu, Image Handling, All Features
 // ============================================
 
 // ----- STATE MANAGEMENT -----
 let portfolioData = null;
-let currentFileUrls = { cv: null, resume: null };
 let animationLevel = 'full';
 
 // ----- INITIALIZATION -----
@@ -15,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadThemePreference();
   setupMobileInteractions();
   checkReducedMotion();
+  updateImagePreview();
 });
 
 function initializeApp() {
@@ -62,6 +62,14 @@ function fileToBase64(file) {
   });
 }
 
+// ----- IMAGE PREVIEW -----
+function updateImagePreview() {
+  const previewImg = document.getElementById('imagePreview');
+  if (previewImg && portfolioData.profileImage) {
+    previewImg.src = portfolioData.profileImage;
+  }
+}
+
 // ----- RENDER FORM FIELDS -----
 function renderFormFields() {
   // Basic Info
@@ -72,6 +80,9 @@ function renderFormFields() {
   setValue('locationInput', portfolioData.location);
   setValue('emailInput', portfolioData.email);
   setValue('phoneInput', portfolioData.phone);
+  
+  // Update image preview
+  updateImagePreview();
   
   // Skills
   const skillsContainer = document.getElementById('skillsContainer');
@@ -101,10 +112,12 @@ function renderFormFields() {
   
   // File names display
   if (portfolioData.cvFileName) {
-    document.getElementById('cvFileName').innerHTML = `<i class="fas fa-file-pdf"></i> ${portfolioData.cvFileName}`;
+    const cvNameDiv = document.getElementById('cvFileName');
+    if (cvNameDiv) cvNameDiv.innerHTML = `<i class="fas fa-file-pdf"></i> ${portfolioData.cvFileName}`;
   }
   if (portfolioData.resumeFileName) {
-    document.getElementById('resumeFileName').innerHTML = `<i class="fas fa-file-pdf"></i> ${portfolioData.resumeFileName}`;
+    const resumeNameDiv = document.getElementById('resumeFileName');
+    if (resumeNameDiv) resumeNameDiv.innerHTML = `<i class="fas fa-file-pdf"></i> ${portfolioData.resumeFileName}`;
   }
 }
 
@@ -126,7 +139,7 @@ function createTagElement(text, idx, type) {
     saveToStorage();
     renderFormFields();
     renderPortfolio();
-    showToast(`${type} removed`, 'info');
+    showToast(`${type === 'skill' ? 'Skill' : 'Certification'} removed`, 'info');
   });
   return tag;
 }
@@ -260,9 +273,9 @@ function renderPortfolio() {
   // Build social HTML
   let socialHtml = '';
   for (const [platform, url] of Object.entries(data.socialLinks || {})) {
-    if (url) {
+    if (url && url !== '#') {
       let icon = 'fa-link';
-      if (platform === 'linkedin') icon = 'fab fa-linkedin';
+      if (platform === 'linkedin') icon = 'fab fa-linkedin-in';
       else if (platform === 'github') icon = 'fab fa-github';
       else if (platform === 'twitter') icon = 'fab fa-twitter';
       else if (platform === 'dribbble') icon = 'fab fa-dribbble';
@@ -274,12 +287,11 @@ function renderPortfolio() {
   const skillsHtml = (data.skills || []).map(s => `<span class="skill-badge">${escapeHtml(s)}</span>`).join('');
   
   // Projects HTML
-  const projectsHtml = (data.projects || []).map(p => `
+  const projectsHtml = (data.projects || []).filter(p => p.name && p.name !== 'New Project').map(p => `
     <div class="project-card">
       <h4>${escapeHtml(p.name)}</h4>
       <p>${escapeHtml(p.description)}</p>
-      ${p.tech ? `<div class="project-tech">${p.tech.map(t => `<span class="tech-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
-      ${p.link && p.link !== '#' ? `<a href="${p.link}" target="_blank" class="project-link">View Project →</a>` : ''}
+      ${p.link && p.link !== '#' ? `<a href="${p.link}" target="_blank" class="project-link">View Project <i class="fas fa-arrow-right"></i></a>` : ''}
     </div>
   `).join('');
   
@@ -293,7 +305,7 @@ function renderPortfolio() {
       <h4>Curriculum Vitae</h4>
       <div class="doc-meta">PDF · Detailed experience</div>
       <button class="btn-primary download-cv-btn"><i class="fas fa-download"></i> Download CV</button>
-      ${data.cvFile.startsWith('data:') ? `<div class="pdf-preview"><iframe src="${data.cvFile}" title="CV Preview" width="100%" height="180px"></iframe></div>` : ''}
+      ${data.cvFile.startsWith('data:') ? `<div class="pdf-preview"><iframe src="${data.cvFile}" title="CV Preview"></iframe></div>` : ''}
     </div>
   ` : `
     <div class="doc-card">
@@ -310,7 +322,7 @@ function renderPortfolio() {
       <h4>Professional Resume</h4>
       <div class="doc-meta">PDF · One-page summary</div>
       <button class="btn-primary download-resume-btn"><i class="fas fa-download"></i> Download Resume</button>
-      ${data.resumeFile.startsWith('data:') ? `<div class="pdf-preview"><iframe src="${data.resumeFile}" title="Resume Preview" width="100%" height="180px"></iframe></div>` : ''}
+      ${data.resumeFile.startsWith('data:') ? `<div class="pdf-preview"><iframe src="${data.resumeFile}" title="Resume Preview"></iframe></div>` : ''}
     </div>
   ` : `
     <div class="doc-card">
@@ -321,12 +333,9 @@ function renderPortfolio() {
     </div>
   `;
   
-  // Apply animation class based on settings
-  const animationClass = animationLevel === 'none' ? 'no-animation' : '';
-  
   previewDiv.innerHTML = `
-    <div class="hero-section ${animationClass}">
-      <img src="${data.profileImage || 'https://via.placeholder.com/120'}" class="profile-img-large" onerror="this.src='https://via.placeholder.com/120'" alt="${escapeHtml(data.name)}">
+    <div class="hero-section">
+      <img src="${data.profileImage || 'https://via.placeholder.com/140'}" class="profile-img-large" onerror="this.src='https://via.placeholder.com/140'" alt="${escapeHtml(data.name)}">
       <h1>${escapeHtml(data.name)}</h1>
       <div class="hero-title">${escapeHtml(data.title)}</div>
       <div class="location-email">
@@ -338,7 +347,7 @@ function renderPortfolio() {
         <span><i class="fas fa-download"></i> CV: ${data.analytics?.cvDownloads || 0}</span>
         <span><i class="fas fa-file-alt"></i> Resume: ${data.analytics?.resumeDownloads || 0}</span>
       </div>
-      <div class="social-links">${socialHtml}</div>
+      ${socialHtml ? `<div class="social-links">${socialHtml}</div>` : ''}
     </div>
     
     <div class="recruiter-summary">
@@ -347,24 +356,26 @@ function renderPortfolio() {
       <div class="recruiter-details">
         📍 ${escapeHtml(data.location)} | 📧 ${escapeHtml(data.email)} | 📞 ${escapeHtml(data.phone || 'Not provided')}
       </div>
-      <button id="whatsappSummaryBtn" class="btn-whatsapp" style="margin-top: 12px;">
+      <button id="whatsappSummaryBtn" class="btn-whatsapp" style="margin-top: 16px;">
         <i class="fab fa-whatsapp"></i> Contact via WhatsApp
       </button>
     </div>
     
+    ${skillsHtml ? `
     <div class="skills-section">
       <h3><i class="fas fa-code"></i> Core Skills</h3>
       <div class="skills-list">${skillsHtml}</div>
     </div>
+    ` : ''}
     
-    ${data.projects && data.projects.length ? `
+    ${projectsHtml ? `
     <div class="projects-section">
       <h3><i class="fas fa-project-diagram"></i> Featured Projects</h3>
       <div class="projects-grid">${projectsHtml}</div>
     </div>
     ` : ''}
     
-    ${data.certifications && data.certifications.length ? `
+    ${certsHtml ? `
     <div class="certifications-section">
       <h3><i class="fas fa-certificate"></i> Certifications</h3>
       <div class="certs-list">${certsHtml}</div>
@@ -380,7 +391,7 @@ function renderPortfolio() {
     </div>
     
     <div class="portfolio-footer">
-      <p>Career Portfolio Generator — Created with <i class="fas fa-heart" style="color: var(--danger);"></i></p>
+      <p>✨ Career Portfolio Generator — Create your professional portfolio in minutes ✨</p>
     </div>
   `;
   
@@ -479,48 +490,76 @@ function openShareModal() {
   if (modal) {
     modal.classList.add('active');
     updateShareLink();
-    generateQRCode();
+    generateSimpleQR();
   }
 }
 
-function generateQRCode() {
+function generateSimpleQR() {
   const qrContainer = document.getElementById('qrCodeContainer');
   if (!qrContainer) return;
   
   qrContainer.innerHTML = '';
-  const url = window.location.href;
-  
-  // Simple QR code using canvas (fallback if QRCode library not available)
   const canvas = document.createElement('canvas');
-  canvas.width = 150;
-  canvas.height = 150;
+  canvas.width = 120;
+  canvas.height = 120;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, 150, 150);
+  ctx.fillRect(0, 0, 120, 120);
   ctx.fillStyle = '#000000';
-  ctx.font = '12px Arial';
-  ctx.fillText('📱 Scan me', 45, 75);
-  ctx.fillText('⬇️', 70, 95);
+  ctx.font = '10px Arial';
+  ctx.fillText('📱', 52, 50);
+  ctx.fillText('Scan me', 38, 75);
+  ctx.fillStyle = '#6366f1';
+  ctx.fillRect(40, 85, 40, 4);
   qrContainer.appendChild(canvas);
+}
+
+function shareOnPlatform(platform) {
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent(`Check out my professional portfolio!`);
+  let shareUrl = '';
+  
+  switch(platform) {
+    case 'whatsapp':
+      const phone = portfolioData.phone?.replace(/\D/g, '') || '';
+      shareUrl = phone ? `https://wa.me/${phone}?text=${text}%20${url}` : `https://wa.me/?text=${text}%20${url}`;
+      break;
+    case 'linkedin':
+      shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+      break;
+    case 'twitter':
+      shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+      break;
+  }
+  
+  if (shareUrl) {
+    window.open(shareUrl, '_blank');
+  }
 }
 
 // ----- EVENT LISTENERS -----
 function bindEventListeners() {
   // Input fields
-  const inputIds = ['nameInput', 'titleInput', 'bioInput', 'imageUrlInput', 'locationInput', 'emailInput', 'phoneInput'];
-  inputIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('input', (e) => {
-        const key = id.replace('Input', '').toLowerCase();
-        if (key === 'bio') portfolioData.about = e.target.value;
-        else if (key === 'imageurl') portfolioData.profileImage = e.target.value;
-        else portfolioData[key] = e.target.value;
-        saveToStorage();
-        debouncedRender();
-      });
-    }
-  });
+  const nameInput = document.getElementById('nameInput');
+  if (nameInput) nameInput.addEventListener('input', (e) => { portfolioData.name = e.target.value; saveToStorage(); debouncedRender(); updateImagePreview(); });
+  
+  const titleInput = document.getElementById('titleInput');
+  if (titleInput) titleInput.addEventListener('input', (e) => { portfolioData.title = e.target.value; saveToStorage(); debouncedRender(); });
+  
+  const bioInput = document.getElementById('bioInput');
+  if (bioInput) bioInput.addEventListener('input', (e) => { portfolioData.about = e.target.value; saveToStorage(); debouncedRender(); });
+  
+  const imageUrlInput = document.getElementById('imageUrlInput');
+  if (imageUrlInput) imageUrlInput.addEventListener('input', (e) => { portfolioData.profileImage = e.target.value; saveToStorage(); debouncedRender(); updateImagePreview(); });
+  
+  const locationInput = document.getElementById('locationInput');
+  if (locationInput) locationInput.addEventListener('input', (e) => { portfolioData.location = e.target.value; saveToStorage(); debouncedRender(); });
+  
+  const emailInput = document.getElementById('emailInput');
+  if (emailInput) emailInput.addEventListener('input', (e) => { portfolioData.email = e.target.value; saveToStorage(); debouncedRender(); });
+  
+  const phoneInput = document.getElementById('phoneInput');
+  if (phoneInput) phoneInput.addEventListener('input', (e) => { portfolioData.phone = e.target.value; saveToStorage(); debouncedRender(); });
   
   // Add Skill
   const addSkillBtn = document.getElementById('addSkillBtn');
@@ -612,9 +651,7 @@ function bindEventListeners() {
   
   // Layout selection
   const layoutSelect = document.getElementById('layoutSelect');
-  if (layoutSelect) {
-    layoutSelect.addEventListener('change', () => renderPortfolio());
-  }
+  if (layoutSelect) layoutSelect.addEventListener('change', () => renderPortfolio());
   
   // Reset data
   const resetBtn = document.getElementById('resetDataBtn');
@@ -635,7 +672,7 @@ function bindEventListeners() {
       const dataStr = JSON.stringify(portfolioData, null, 2);
       const blob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      downloadFile(url, `portfolio-${portfolioData.name?.replace(/\s/g, '-') || 'config'}.json`);
+      downloadFile(url, `portfolio-${(portfolioData.name || 'config').replace(/\s/g, '-')}.json`);
       URL.revokeObjectURL(url);
       showToast('Config exported successfully', 'success');
     });
@@ -708,6 +745,16 @@ function bindEventListeners() {
     document.getElementById('shareModal')?.classList.remove('active');
   });
   
+  // Share buttons
+  const shareWhatsApp = document.getElementById('shareWhatsApp');
+  if (shareWhatsApp) shareWhatsApp.addEventListener('click', () => shareOnPlatform('whatsapp'));
+  
+  const shareLinkedIn = document.getElementById('shareLinkedIn');
+  if (shareLinkedIn) shareLinkedIn.addEventListener('click', () => shareOnPlatform('linkedin'));
+  
+  const shareTwitter = document.getElementById('shareTwitter');
+  if (shareTwitter) shareTwitter.addEventListener('click', () => shareOnPlatform('twitter'));
+  
   // File uploads
   const profileUpload = document.getElementById('profileUpload');
   if (profileUpload) {
@@ -717,8 +764,11 @@ function bindEventListeners() {
         const base64 = await fileToBase64(file);
         portfolioData.profileImage = base64;
         saveToStorage();
+        renderFormFields();
         renderPortfolio();
         showToast('Profile image updated', 'success');
+      } else if (file) {
+        showToast('Please upload an image file', 'error');
       }
     });
   }
@@ -735,7 +785,7 @@ function bindEventListeners() {
         renderFormFields();
         renderPortfolio();
         showToast('CV uploaded successfully', 'success');
-      } else {
+      } else if (file) {
         showToast('Please upload a PDF file', 'error');
       }
     });
@@ -753,45 +803,62 @@ function bindEventListeners() {
         renderFormFields();
         renderPortfolio();
         showToast('Resume uploaded successfully', 'success');
-      } else {
+      } else if (file) {
         showToast('Please upload a PDF file', 'error');
       }
     });
   }
 }
 
-// ----- MOBILE INTERACTIONS -----
+// ----- MOBILE INTERACTIONS (FIXED) -----
 function setupMobileInteractions() {
   const sidebar = document.getElementById('editorSidebar');
   const openBtn = document.getElementById('openSidebarBtn');
   const closeBtn = document.getElementById('closeSidebarBtn');
   const overlay = document.getElementById('mobileOverlay');
   
+  console.log('Setting up mobile interactions...'); // Debug log
+  
+  // Open sidebar
   if (openBtn) {
-    openBtn.addEventListener('click', () => {
-      sidebar?.classList.add('active');
-      overlay?.classList.add('active');
-      document.body.style.overflow = 'hidden';
+    openBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log('Open button clicked'); // Debug log
+      if (sidebar) {
+        sidebar.classList.add('active');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
     });
   }
   
+  // Close sidebar function
   const closeSidebar = () => {
-    sidebar?.classList.remove('active');
-    overlay?.classList.remove('active');
-    document.body.style.overflow = '';
+    if (sidebar) {
+      sidebar.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
   };
   
-  if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
-  if (overlay) overlay.addEventListener('click', closeSidebar);
+  // Close button
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeSidebar);
+  }
   
-  // Close sidebar on escape key
+  // Overlay click
+  if (overlay) {
+    overlay.addEventListener('click', closeSidebar);
+  }
+  
+  // Close on escape key
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && sidebar?.classList.contains('active')) {
+    if (e.key === 'Escape' && sidebar && sidebar.classList.contains('active')) {
       closeSidebar();
     }
   });
   
-  // Click outside modal to close
+  // Close modal on outside click
   const modal = document.getElementById('shareModal');
   if (modal) {
     modal.addEventListener('click', (e) => {
@@ -800,6 +867,19 @@ function setupMobileInteractions() {
       }
     });
   }
+  
+  // Handle window resize - close sidebar on resize to desktop
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (window.innerWidth > 900 && sidebar) {
+        sidebar.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }, 250);
+  });
 }
 
 // ----- THEME & PREFERENCES -----
@@ -839,7 +919,7 @@ function checkReducedMotion() {
   }
 }
 
-// Dark mode toggle
+// Dark mode setup
 function setupDarkMode() {
   const darkBtn = document.getElementById('darkModeToggle');
   if (darkBtn) {
@@ -862,12 +942,24 @@ function setupDarkMode() {
 function handleSkillKeyPress(event) {
   if (event.key === 'Enter') {
     event.preventDefault();
-    document.getElementById('addSkillBtn')?.click();
+    const addBtn = document.getElementById('addSkillBtn');
+    if (addBtn) addBtn.click();
   }
 }
 
 // Make function global for HTML onkeypress
 window.handleSkillKeyPress = handleSkillKeyPress;
 
-// Initialize dark mode after DOM
+// Initialize dark mode
 setTimeout(setupDarkMode, 100);
+
+// ----- UTILITIES -----
+function escapeHtml(str) {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
