@@ -1,25 +1,37 @@
-<!-- index.html -->
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Professional portfolio generator for job seekers - create and share your portfolio in minutes">
+  <meta name="theme-color" content="#6366f1">
   <title>Career Portfolio Generator | Professional Portfolio Kit</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  
   <div class="app-container">
     <!-- EDITOR SIDEBAR -->
     <aside class="editor-sidebar" id="editorSidebar">
       <div class="sidebar-header">
-        <h2><i class="fas fa-magic"></i> Portfolio Builder</h2>
+        <div class="sidebar-header-top">
+          <h2><i class="fas fa-magic"></i> Portfolio Builder</h2>
+          <button class="close-sidebar-btn" id="closeSidebarBtn"><i class="fas fa-times"></i></button>
+        </div>
         <p class="sidebar-subtitle">Edit your data → Live preview</p>
-        <button class="toggle-sidebar-btn" id="toggleSidebar"><i class="fas fa-chevron-left"></i></button>
       </div>
 
       <div class="editor-content" id="editorContent">
+        <!-- Quick Tips -->
+        <div class="quick-tips">
+          <i class="fas fa-lightbulb"></i>
+          <span>Changes save automatically. Preview updates in real-time!</span>
+        </div>
+
         <!-- Personal Info -->
         <div class="form-section">
           <h3><i class="fas fa-user"></i> Personal Info</h3>
@@ -48,13 +60,17 @@
           <div class="form-row">
             <div class="form-group">
               <label>Phone / WhatsApp</label>
-              <input type="text" id="phoneInput" placeholder="+1234567890">
+              <input type="tel" id="phoneInput" placeholder="+1234567890">
             </div>
           </div>
           <div class="form-group">
             <label>Profile Image</label>
-            <input type="text" id="imageUrlInput" placeholder="https://...">
-            <input type="file" id="profileUpload" accept="image/*" class="file-input">
+            <div class="image-upload-area">
+              <input type="text" id="imageUrlInput" placeholder="https://...">
+              <div class="upload-divider">or</div>
+              <input type="file" id="profileUpload" accept="image/*" class="file-input">
+              <label for="profileUpload" class="file-label"><i class="fas fa-upload"></i> Upload Image</label>
+            </div>
           </div>
         </div>
 
@@ -62,7 +78,7 @@
         <div class="form-section">
           <h3><i class="fas fa-code"></i> Skills</h3>
           <div class="tag-input-group">
-            <input type="text" id="skillInput" placeholder="e.g., UX Research">
+            <input type="text" id="skillInput" placeholder="e.g., UX Research" onkeypress="handleSkillKeyPress(event)">
             <button id="addSkillBtn" class="btn-small">+ Add</button>
           </div>
           <div class="tags-container" id="skillsContainer"></div>
@@ -72,14 +88,24 @@
         <div class="form-section">
           <h3><i class="fas fa-project-diagram"></i> Projects</h3>
           <div id="projectsList"></div>
-          <button id="addProjectBtn" class="btn-outline btn-full">+ Add Project</button>
+          <button id="addProjectBtn" class="btn-outline btn-full"><i class="fas fa-plus"></i> Add Project</button>
         </div>
 
         <!-- Social Links -->
         <div class="form-section">
           <h3><i class="fas fa-share-alt"></i> Social Links</h3>
           <div id="socialList"></div>
-          <button id="addSocialBtn" class="btn-outline btn-full">+ Add Social</button>
+          <button id="addSocialBtn" class="btn-outline btn-full"><i class="fas fa-plus"></i> Add Social</button>
+        </div>
+
+        <!-- Certifications -->
+        <div class="form-section">
+          <h3><i class="fas fa-certificate"></i> Certifications</h3>
+          <div class="tag-input-group">
+            <input type="text" id="certInput" placeholder="e.g., AWS Certified">
+            <button id="addCertBtn" class="btn-small">+ Add</button>
+          </div>
+          <div class="tags-container" id="certsContainer"></div>
         </div>
 
         <!-- Documents -->
@@ -88,33 +114,43 @@
           <div class="form-group">
             <label>CV (PDF)</label>
             <input type="file" id="cvUpload" accept=".pdf" class="file-input">
-            <small id="cvFileName"></small>
+            <div id="cvFileName" class="file-name-display"></div>
           </div>
           <div class="form-group">
             <label>Resume (PDF)</label>
             <input type="file" id="resumeUpload" accept=".pdf" class="file-input">
-            <small id="resumeFileName"></small>
+            <div id="resumeFileName" class="file-name-display"></div>
           </div>
         </div>
 
         <!-- Customization -->
         <div class="form-section">
           <h3><i class="fas fa-palette"></i> Customization</h3>
-          <div class="form-group">
-            <label>Color Theme</label>
-            <select id="themeSelect">
-              <option value="default">Default (Indigo)</option>
-              <option value="modern">Modern (Pink)</option>
-              <option value="creative">Creative (Amber)</option>
-              <option value="minimal">Minimal (Slate)</option>
-            </select>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Color Theme</label>
+              <select id="themeSelect">
+                <option value="default">Default (Indigo)</option>
+                <option value="modern">Modern (Pink)</option>
+                <option value="creative">Creative (Amber)</option>
+                <option value="minimal">Minimal (Slate)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Layout Style</label>
+              <select id="layoutSelect">
+                <option value="modern">Modern (Cards)</option>
+                <option value="minimal">Minimal (Clean)</option>
+                <option value="creative">Creative (Bold)</option>
+              </select>
+            </div>
           </div>
           <div class="form-group">
-            <label>Layout Style</label>
-            <select id="layoutSelect">
-              <option value="modern">Modern (Cards)</option>
-              <option value="minimal">Minimal (Clean)</option>
-              <option value="creative">Creative (Bold)</option>
+            <label>Animation Level</label>
+            <select id="animationSelect">
+              <option value="full">Full Animations</option>
+              <option value="reduced">Reduced Motion</option>
+              <option value="none">No Animations</option>
             </select>
           </div>
         </div>
@@ -122,20 +158,57 @@
         <!-- Actions -->
         <div class="form-actions">
           <button id="resetDataBtn" class="btn-danger"><i class="fas fa-trash"></i> Reset All</button>
-          <button id="exportConfigBtn" class="btn-outline"><i class="fas fa-download"></i> Export Config</button>
+          <button id="exportConfigBtn" class="btn-outline"><i class="fas fa-download"></i> Export</button>
+          <button id="importConfigBtn" class="btn-outline"><i class="fas fa-upload"></i> Import</button>
         </div>
-        <p class="auto-save-note"><i class="fas fa-save"></i> Auto-saves to browser storage</p>
+        <input type="file" id="importFileInput" accept=".json" style="display: none;">
+        <p class="auto-save-note"><i class="fas fa-save"></i> Auto-saves to browser</p>
       </div>
     </aside>
 
     <!-- PORTFOLIO PREVIEW -->
     <main class="preview-area">
       <div class="sticky-toolbar">
-        <button id="stickyDownloadCV" class="btn-primary"><i class="fas fa-download"></i> Download CV</button>
-        <button id="whatsappStickyBtn" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-        <button id="toggleSidebarMobile" class="btn-outline mobile-only"><i class="fas fa-edit"></i> Edit</button>
+        <button class="mobile-menu-btn" id="openSidebarBtn"><i class="fas fa-edit"></i> Edit</button>
+        <button id="stickyDownloadCV" class="btn-primary"><i class="fas fa-download"></i> CV</button>
+        <button id="stickyDownloadResume" class="btn-primary"><i class="fas fa-file-alt"></i> Resume</button>
+        <button id="whatsappStickyBtn" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> <span class="btn-text">WhatsApp</span></button>
+        <button id="sharePortfolioBtn" class="btn-outline"><i class="fas fa-share-alt"></i> <span class="btn-text">Share</span></button>
+        <button id="darkModeToggle" class="btn-outline"><i class="fas fa-moon"></i></button>
       </div>
+      
+      <!-- Loading Spinner -->
+      <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+        <i class="fas fa-spinner fa-spin"></i> Loading...
+      </div>
+      
       <div id="portfolioPreview" class="portfolio-container"></div>
+      
+      <!-- Share Modal -->
+      <div class="share-modal" id="shareModal">
+        <div class="share-modal-content">
+          <div class="share-modal-header">
+            <h3>Share Your Portfolio</h3>
+            <button class="close-modal" id="closeModalBtn">&times;</button>
+          </div>
+          <div class="share-modal-body">
+            <p>Copy the link below to share your portfolio</p>
+            <div class="share-link-container">
+              <input type="text" id="shareLinkInput" readonly>
+              <button id="copyLinkBtn" class="btn-small">Copy</button>
+            </div>
+            <div class="share-qr" id="qrCodeContainer"></div>
+            <div class="share-buttons">
+              <button id="shareWhatsApp" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+              <button id="shareLinkedIn" class="btn-outline"><i class="fab fa-linkedin"></i> LinkedIn</button>
+              <button id="shareTwitter" class="btn-outline"><i class="fab fa-twitter"></i> Twitter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Toast Notification -->
+      <div class="toast-notification" id="toast"></div>
     </main>
   </div>
 
