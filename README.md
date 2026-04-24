@@ -7,487 +7,343 @@
 ![Platform](https://img.shields.io/badge/platform-web-orange.svg)
 ![Mobile Ready](https://img.shields.io/badge/mobile-ready-brightgreen.svg)
 
-**Create a stunning professional portfolio in minutes - No coding required!**
+**Create a stunning professional portfolio in minutes — no coding required.**
 
-[Features](#features) • [Quick Start](#quick-start) • [Customization](#customization) • [FAQ](#faq) • [Support](#support)
+[Features](#-features) · [Quick Start](#-quick-start) · [Customization](#-customization-guide) · [FAQ](#-faq) · [Support](#-support)
 
 </div>
 
 ---
 
 ## 📋 Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [Installation](#installation)
-- [Customization Guide](#customization-guide)
-- [File Structure](#file-structure)
-- [Configuration Examples](#configuration-examples)
-- [Mobile Responsiveness](#mobile-responsiveness)
-- [Deployment](#deployment)
-- [FAQ](#faq)
-- [Troubleshooting](#troubleshooting)
-- [Best Practices](#best-practices)
-- [Support](#support)
-- [License](#license)
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [Quick Start](#-quick-start)
+- [Installation](#-installation)
+- [Customization Guide](#-customization-guide)
+- [File Structure](#-file-structure)
+- [Configuration Examples](#-configuration-examples)
+- [Mobile Responsiveness](#-mobile-responsiveness)
+- [Deployment](#-deployment)
+- [FAQ](#-faq)
+- [Troubleshooting](#-troubleshooting)
+- [Best Practices](#-best-practices)
+- [Support](#-support)
+- [License](#-license)
 
 ---
 
 ## 🎯 Overview
 
-The **Career Portfolio Generator** is a powerful, config-driven portfolio system designed for job seekers across all industries. Whether you're a developer, clinician, designer, student, or freelancer, this tool helps you create a professional online presence in minutes.
+The **Career Portfolio Generator** is a modern, config-driven portfolio system designed for job seekers in any industry — whether you're a developer, designer, clinician, student, freelancer, marketer, or teacher.
 
-### Why Choose This Portfolio?
+### Why Use This?
 
-- ⚡ **Zero Coding Required** - Edit one config file, and you're done
-- 📱 **Fully Responsive** - Looks perfect on all devices
-- 🎨 **4 Built-in Themes** - Match your industry and personality
-- 📄 **PDF Document Support** - Upload, preview, and share CV/Resume
-- 🔗 **Social Integration** - LinkedIn, GitHub, Twitter, WhatsApp
-- 💾 **Local Storage** - Your data stays in your browser
-- 📊 **Analytics** - Track views and downloads
-- 🚀 **One-Click Deploy** - Host on GitHub Pages for free
+| Benefit | Details |
+|---|---|
+| ⚡ Zero Coding | Edit one config file and you're done |
+| 📱 Fully Responsive | Looks great on mobile, tablet, and desktop |
+| 🎨 Multiple Themes | Switch styles instantly |
+| 📄 PDF Support | Upload your CV and resume |
+| 🔗 Social Integration | LinkedIn, GitHub, Twitter, WhatsApp |
+| 💾 Auto Save | Persists via `localStorage` |
+| 📊 Analytics | Track views and downloads |
+| 🚀 Free Deployment | GitHub Pages, Netlify, or Vercel |
 
 ---
 
 ## ✨ Features
 
-### Core Features
-| Feature | Description |
-|---------|-------------|
-| 🎨 **Live Preview** | See changes instantly as you type |
-| 📝 **Config-Driven** | All content from a single JSON file |
-| 🖼️ **Image Upload** | Drag & drop or URL for profile photo |
-| 📄 **PDF Manager** | Upload, preview, download, delete documents |
-| 🏷️ **Skills Tags** | Easy add/remove skills |
-| 📁 **Projects Showcase** | Display your best work with links |
-| 🔗 **Social Links** | Connect all your professional profiles |
-| 📜 **Certifications** | Showcase your credentials |
-| 🎯 **Recruiter Summary** | Key info highlighted for hiring managers |
+### Core
 
-### Advanced Features
 | Feature | Description |
-|---------|-------------|
-| 🌓 **Dark/Light Mode** | Automatic or manual toggle |
-| 🎨 **4 Color Themes** | Default, Modern, Creative, Minimal |
-| 📐 **Layout Options** | Modern, Minimal, Creative layouts |
-| 📱 **Mobile Optimized** | Touch-friendly interface |
-| 🔄 **Import/Export** | Backup and restore your config |
-| 📊 **Analytics** | Track views and document downloads |
-| 🔗 **Share Modal** | QR code + social sharing |
-| 💬 **WhatsApp Integration** | One-click contact |
-| 📎 **Drag & Drop Upload** | Easy file management |
+|---|---|
+| 🎨 Live Preview | Changes update in real time |
+| 📝 Config-Driven | All editing done in `config.js` |
+| 🖼️ Profile Image | Upload via URL or drag & drop |
+| 📄 PDF Manager | Upload, preview, download, and delete |
+| 🏷️ Skills Tags | Add or remove skills dynamically |
+| 📁 Projects Showcase | Highlight your best work |
+| 🔗 Social Links | Connect professional profiles |
+| 📜 Certifications | Display qualifications |
+| 🎯 Recruiter Summary | Key details surfaced at a glance |
+
+### Advanced
+
+| Feature | Description |
+|---|---|
+| 🌓 Dark / Light Mode | Toggle appearance anytime |
+| 🎨 4 Themes | Default, Modern, Creative, Minimal |
+| 📐 3 Layouts | Modern, Minimal, Creative |
+| 📱 Mobile Optimized | Smooth touch UI |
+| 🔄 Import / Export | Backup and restore your data |
+| 📊 Analytics | View counts and download tracking |
+| 🔗 Share Modal | QR code and social sharing |
+| 💬 WhatsApp Button | One-tap recruiter contact |
 
 ---
 
 ## 🚀 Quick Start
 
-### 5-Minute Setup
+Get up and running in five minutes:
 
-1. **Download** the project files
-2. **Edit** `config.js` with your information
-3. **Upload** your CV and Resume PDFs to `/assets/`
-4. **Open** `index.html` in your browser
-5. **Share** your portfolio link!
-
-### Prerequisites
-- Any modern web browser (Chrome, Firefox, Safari, Edge)
-- Basic text editor (VS Code, Notepad++, Sublime)
-- PDF files for CV and Resume (optional)
+1. Download the project files
+2. Open `config.js` and fill in your details
+3. Add your CV and resume to `assets/`
+4. Open `index.html` in your browser
+5. Share your portfolio link
 
 ---
 
 ## 📥 Installation
 
-### Option 1: Direct Download
+### Option 1 — Clone the Repository
+
 ```bash
-# Clone the repository
 git clone https://github.com/yourusername/career-portfolio-generator.git
-
-# Navigate to project folder
 cd career-portfolio-generator
+# Then open index.html in your browser
+```
 
-# Open index.html in your browser
-open index.html
-Option 2: Manual Setup
-Create a new folder called my-portfolio
+### Option 2 — Manual Setup
 
-Add all project files:
+Create the following folder structure and open `index.html`:
 
-index.html
+```
+my-portfolio/
+├── index.html
+├── styles.css
+├── script.js
+├── config.js
+└── assets/
+```
 
-styles.css
+---
 
-script.js
+## 🎨 Customization Guide
 
-config.js
+All customization happens in a single file — `config.js`:
 
-Create an assets folder
-
-Add your PDF files to /assets/
-
-Open index.html in your browser
-
-🎨 Customization Guide
-Step 1: Edit Basic Information
-Open config.js and update the following:
-
-javascript
+```javascript
 window.PORTFOLIO_CONFIG = {
-  // Personal Information
   name: "Your Full Name",
-  title: "Your Professional Title",
-  profession: "Your Industry",
+  title: "Your Profession",
+  profession: "Industry",
   location: "City, Country",
-  email: "your.email@example.com",
-  phone: "+1 (555) 123-4567",
-  
-  // Bio - Keep it concise (2-3 sentences)
-  about: "Passionate professional with 5+ years of experience...",
-  
-  // Profile Image (use URL or leave empty)
-  profileImage: "https://example.com/your-photo.jpg",
-  
-  // Documents
+  email: "your@email.com",
+  phone: "+123456789",
+
+  about: "Short professional summary here.",
+
+  profileImage: "https://your-image-url.com/photo.jpg",
+
   cvFile: "/assets/cv.pdf",
   resumeFile: "/assets/resume.pdf",
-  
-  // Skills - Add your key competencies
-  skills: [
-    "Skill 1",
-    "Skill 2",
-    "Skill 3"
-  ],
-  
-  // Projects - Showcase your best work
+
+  skills: ["React", "Node.js", "UI Design"],
+
   projects: [
     {
       name: "Project Name",
-      description: "Brief description of the project",
+      description: "Short project description",
       link: "https://project-link.com"
     }
   ],
-  
-  // Certifications
-  certifications: [
-    "Certification 1",
-    "Certification 2"
-  ],
-  
-  // Social Links
+
+  certifications: ["Certification 1", "Certification 2"],
+
   socialLinks: {
     linkedin: "https://linkedin.com/in/username",
     github: "https://github.com/username",
     twitter: "https://twitter.com/username"
   }
 };
-Step 2: Upload Documents
-Place your CV PDF in /assets/cv.pdf
+```
 
-Place your Resume PDF in /assets/resume.pdf
+---
 
-Or use the built-in uploader in the Documents section
+## 📁 File Structure
 
-Step 3: Customize Appearance
-Use the customization panel in the sidebar:
-
-Color Theme: Default (Indigo), Modern (Pink), Creative (Amber), Minimal (Slate)
-
-Layout Style: Modern (Cards), Minimal (Clean), Creative (Bold)
-
-Animation Level: Full, Reduced, None
-
-📁 File Structure
-text
+```
 career-portfolio-generator/
-│
-├── index.html          # Main HTML file
-├── styles.css          # All styling (responsive)
-├── script.js           # Core functionality
-├── config.js           # ⭐ YOUR CONFIGURATION FILE ⭐
-├── assets/             # Folder for your documents
-│   ├── cv.pdf         # Your CV (optional)
-│   └── resume.pdf     # Your Resume (optional)
-└── README.md          # Documentation
-File Descriptions
-File	Purpose	Editable?
-config.js	All your personal data	✅ YES
-assets/	PDF documents	✅ YES
-index.html	Page structure	⚠️ Advanced only
-styles.css	Visual styling	⚠️ Advanced only
-script.js	Functionality	❌ No (unless expert)
-📱 Mobile Responsiveness
-The portfolio is fully responsive and optimized for:
-
-Device	Breakpoint	Features
-📱 Mobile	< 480px	Collapsible sidebar, touch buttons, optimized layout
-📱 Tablet	481px - 900px	Adjusted spacing, readable fonts
-💻 Desktop	> 901px	Full sidebar, hover effects, multi-column layout
-🖨️ Print	Print media	Optimized for paper printing
-Mobile Tips
-Use the Edit Portfolio button to open the sidebar
-
-Buttons are sized for touch (min 44x44px)
-
-PDF previews are scrollable
-
-WhatsApp button for easy contact
-
-🚀 Deployment
-Deploy to GitHub Pages (Free)
-Create a GitHub repository
-
-bash
-git init
-git add .
-git commit -m "Initial portfolio commit"
-git branch -M main
-git remote add origin https://github.com/yourusername/portfolio.git
-git push -u origin main
-Enable GitHub Pages
-
-Go to repository Settings
-
-Navigate to Pages section
-
-Select branch: main / root folder
-
-Save
-
-Access your portfolio
-
-Your site will be live at: https://yourusername.github.io/portfolio/
-
-Deploy to Netlify (Free)
-Drag and drop your project folder to Netlify Drop
-
-Your site is live instantly!
-
-Deploy to Vercel (Free)
-bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-❓ FAQ
-General Questions
-Q: Do I need to know coding?
-A: No! Just edit config.js and you're done.
-
-Q: Where is my data stored?
-A: All data is stored in your browser's localStorage. No database required.
-
-Q: Can I use this for free?
-A: Yes! The portfolio is completely free to use and modify.
-
-Q: Is it mobile-friendly?
-A: Absolutely! Fully responsive on all devices.
-
-Technical Questions
-Q: What file types are supported?
-A: Images (JPG, PNG, GIF) and Documents (PDF only for CV/Resume).
-
-Q: Maximum file size?
-A: 10MB for PDFs, 5MB for images.
-
-Q: Can I add more than 5 projects?
-A: Yes, add as many as you want in the projects array.
-
-Q: How do I backup my data?
-A: Use the Export button in the sidebar to save your config.json.
-
-Recruiter Questions
-Q: Can recruiters download my CV?
-A: Yes, there are multiple download buttons throughout the portfolio.
-
-Q: Is there analytics?
-A: Yes, view counts and download counts are tracked.
-
-Q: Can I add a WhatsApp button?
-A: Yes, just add your phone number in the contact section.
-
-🔧 Troubleshooting
-Common Issues and Solutions
-Issue	Solution
-Images not loading	Check image URL is correct and publicly accessible
-PDFs not downloading	Ensure files are in /assets/ folder or uploaded via form
-Sidebar not opening on mobile	Click the "Edit Portfolio" button in the top toolbar
-Changes not saving	Clear browser cache and localStorage
-Theme not applying	Check theme selector in customization section
-Social links not working	Verify URLs include https://
-Analytics not updating	Views increment on each page load
-Reset Instructions
-To completely reset your portfolio:
-
-Click Reset All button in sidebar
-
-Confirm the dialog
-
-Page will reload with default config
-
-Browser Compatibility
-Browser	Version	Support
-Chrome	90+	✅ Full
-Firefox	88+	✅ Full
-Safari	14+	✅ Full
-Edge	90+	✅ Full
-Opera	76+	✅ Full
-iOS Safari	14+	✅ Full
-Chrome Android	90+	✅ Full
-💡 Best Practices
-For Job Seekers
-✅ DO:
-
-Keep your bio concise (2-3 sentences)
-
-Use a professional profile photo
-
-List 5-10 key skills
-
-Showcase 3-5 best projects
-
-Keep CV under 2MB
-
-Update portfolio monthly
-
-Test on mobile before sharing
-
-Export config as backup
-
-❌ DON'T:
-
-Use unprofessional email addresses
-
-Exaggerate skills or experience
-
-Add broken project links
-
-Upload password-protected PDFs
-
-Ignore mobile responsiveness
-
-Forget to proofread
-
-Share sensitive personal info
-
-For Recruiters
-✅ DO:
-
-Check the recruiter summary section first
-
-Download both CV and Resume
-
-Use WhatsApp for quick contact
-
-Check project links for work samples
-
-View on desktop for best experience
-
-❌ DON'T:
-
-Ignore the analytics (they show engagement)
-
-Skip the skills section
-
-Overlook certifications
-
-📊 Performance Optimization
-Tips for Faster Loading
-Optimize Images
-
-Use JPEG format for photos
-
-Compress to under 500KB
-
-Recommended size: 400x400px
-
-Optimize PDFs
-
-Use Adobe Acrobat "Reduce File Size"
-
-Aim for under 1MB
-
-Remove unnecessary images
-
-Limit Projects
-
-Showcase only best 3-5 projects
-
-Remove outdated work
-
-Use CDN for Images
-
-Host images on Imgur, Cloudinary, or GitHub
-
-🎯 Configuration Examples
-Developer Portfolio
-javascript
+├── index.html       # App structure
+├── styles.css       # Styling
+├── script.js        # App logic
+├── config.js        # ← Your main editing file
+├── README.md        # Documentation
+└── assets/
+    ├── cv.pdf
+    └── resume.pdf
+```
+
+---
+
+## ⚙️ Configuration Examples
+
+### Developer
+
+```javascript
 window.PORTFOLIO_CONFIG = {
   name: "Alex Chen",
   title: "Senior Full Stack Developer",
-  skills: ["React", "Node.js", "Python", "AWS", "MongoDB"],
+  skills: ["React", "Node.js", "MongoDB", "AWS"],
   projects: [
     {
-      name: "E-commerce Platform",
-      description: "Scalable platform handling 10k+ daily users",
-      link: "https://github.com/username/project"
+      name: "E-commerce App",
+      description: "Serves 10k+ daily users",
+      link: "https://github.com/project"
     }
   ]
 };
-Designer Portfolio
-javascript
+```
+
+### Designer
+
+```javascript
 window.PORTFOLIO_CONFIG = {
   name: "Maria Garcia",
   title: "UI/UX Designer",
-  skills: ["Figma", "Adobe XD", "User Research", "Prototyping"],
+  skills: ["Figma", "Adobe XD", "User Research"],
   projects: [
     {
-      name: "Banking App Redesign",
-      description: "Increased user engagement by 45%",
-      link: "https://dribbble.com/username/project"
+      name: "Finance App UI",
+      description: "Modern mobile redesign"
     }
   ]
 };
-Clinician Portfolio
-javascript
+```
+
+### Clinician
+
+```javascript
 window.PORTFOLIO_CONFIG = {
   name: "Dr. Sarah Johnson",
   title: "Clinical Psychologist",
-  skills: ["CBT", "Trauma Therapy", "Psychological Assessment"],
-  certifications: ["Licensed Psychologist", "CBT Certified"],
-  projects: [
-    {
-      name: "Anxiety Treatment Program",
-      description: "Developed 8-week program with 85% success rate"
-    }
-  ]
+  skills: ["CBT", "Trauma Therapy"],
+  certifications: ["Licensed Psychologist"]
 };
-🛠️ Support
-Resources
-📖 Documentation: This README
+```
 
-🐛 Issues: GitHub Issues
+---
 
-💬 Discussions: GitHub Discussions
+## 📱 Mobile Responsiveness
 
-Contact
-📧 Email: support@careerportfolio.com
+| Device | Breakpoint | Status |
+|---|---|---|
+| 📱 Mobile | < 480px | ✅ Optimized |
+| 📱 Tablet | 481px – 900px | ✅ Optimized |
+| 💻 Desktop | > 901px | ✅ Optimized |
+| 🖨️ Print | — | ✅ Supported |
 
-🐦 Twitter: @CareerPortfolio
+---
 
-💼 LinkedIn: Career Portfolio Generator
+## 🚀 Deployment
 
-Feature Requests
-Have an idea for a new feature? Open an issue with the label enhancement!
+### GitHub Pages
 
-📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/yourusername/portfolio.git
+git push -u origin main
+```
 
-text
-MIT License
+Then go to **Settings → Pages**, select the `main` branch, and save. Your portfolio will be live at:
 
-Copyright (c) 2024 Career Portfolio Generator
+```
+https://yourusername.github.io/portfolio/
+```
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files...
+### Netlify
+
+Drag and drop your project folder onto [netlify.com](https://netlify.com) — done.
+
+### Vercel
+
+```bash
+npm i -g vercel
+vercel
+```
+
+---
+
+## ❓ FAQ
+
+**Do I need coding skills?**
+No — just edit `config.js`.
+
+**Where is my data stored?**
+In your browser using `localStorage`.
+
+**Is it mobile-friendly?**
+Yes, fully responsive across all screen sizes.
+
+**Can recruiters download my CV?**
+Yes, with a single click.
+
+**Can I add a WhatsApp contact button?**
+Yes, it's supported out of the box.
+
+---
+
+## 🔧 Troubleshooting
+
+| Issue | Solution |
+|---|---|
+| Images not loading | Check the image URL is correct and publicly accessible |
+| PDFs not opening | Make sure files are placed in the `assets/` folder |
+| Changes not saving | Clear your browser cache and reload |
+| Theme not changing | Hard-refresh the page (Ctrl/Cmd + Shift + R) |
+| Social links broken | Ensure all URLs start with `https://` |
+
+---
+
+## 💡 Best Practices
+
+**Do:**
+- Use a professional, well-lit photo
+- Keep your bio concise and focused
+- Showcase your best 3–5 projects
+- Keep your CV file under 2MB
+- Test on mobile before sharing
+- Update your portfolio monthly
+
+**Don't:**
+- List skills you don't actually have
+- Include broken or outdated links
+- Upload poor-quality PDF files
+- Share sensitive personal data
+
+### Performance Tips
+
+**Images:** Use JPG format, under 500KB, at 400×400px recommended.
+
+**PDFs:** Keep under 2MB, compress where possible, and remove unnecessary pages.
+
+---
+
+## 🛠️ Support
+
+- 📖 [README Documentation](#)
+- 🐛 [GitHub Issues](https://github.com/yourusername/career-portfolio-generator/issues)
+- 💬 [GitHub Discussions](https://github.com/yourusername/career-portfolio-generator/discussions)
+- 📧 support@careerportfolio.com
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+
+⭐ If this project helped you, give it a star!
+
+Built with ❤️ for job seekers worldwide.
+
+</div>
