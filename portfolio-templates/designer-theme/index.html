@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Creative Designer Portfolio - Bold gradients, big imagery, smooth animations" />
+  <title>CreativStudio | Designer Portfolio Theme</title>
+  
+  <!-- Preconnect & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Archivo+Black&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- SIDEBAR – Design Controls -->
+    <aside class="sidebar" aria-label="Designer controls sidebar">
+      <div class="logo-area">
+        <div class="logo-mark">
+          <i class="fa-regular fa-brush"></i>
+        </div>
+        <div>
+          <h2>CreativStudio</h2>
+          <p>designer theme · live editor</p>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="inputName"><i class="fa-regular fa-user"></i> Full name</label>
+        <input type="text" id="inputName" placeholder="Emma Chen" autocomplete="off" maxlength="50">
+      </div>
+
+      <div class="control-group">
+        <label for="inputTitle"><i class="fa-regular fa-badge"></i> Creative title</label>
+        <input type="text" id="inputTitle" placeholder="Creative Director & Visual Designer" maxlength="60">
+      </div>
+
+      <div class="control-group">
+        <label for="inputBio"><i class="fa-regular fa-pen-line"></i> Designer bio</label>
+        <textarea id="inputBio" rows="3" placeholder="Crafting bold visual stories with passion for typography, color, and movement..." maxlength="300"></textarea>
+        <small class="char-counter">0/300</small>
+      </div>
+
+      <div class="control-group">
+        <label for="inputImage"><i class="fa-regular fa-image"></i> Profile image URL</label>
+        <input type="url" id="inputImage" placeholder="https://images.unsplash.com/photo-...">
+        <small class="field-hint">✨ Use high-res portrait for best effect</small>
+      </div>
+
+      <div class="control-group">
+        <label for="inputCoverImage"><i class="fa-regular fa-display"></i> Hero background image</label>
+        <input type="url" id="inputCoverImage" placeholder="https://images.unsplash.com/photo-...">
+        <small class="field-hint">🎨 Big cinematic image for hero section</small>
+      </div>
+
+      <div class="control-group">
+        <label for="inputEmail"><i class="fa-regular fa-envelope"></i> Email address</label>
+        <input type="email" id="inputEmail" placeholder="hello@emma.design">
+      </div>
+
+      <div class="control-group">
+        <label for="inputLocation"><i class="fa-regular fa-location-dot"></i> Location / Studio</label>
+        <input type="text" id="inputLocation" placeholder="Brooklyn, NYC" maxlength="50">
+      </div>
+
+      <div class="control-group">
+        <label for="inputColorTheme"><i class="fa-regular fa-palette"></i> Gradient theme</label>
+        <select id="inputColorTheme">
+          <option value="sunset">🌅 Sunset Blaze</option>
+          <option value="ocean">🌊 Ocean Breeze</option>
+          <option value="aurora">✨ Aurora Dream</option>
+          <option value="candy">🍬 Candy Burst</option>
+          <option value="forest">🌿 Forest Magic</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label><i class="fa-regular fa-tags"></i> Creative skills</label>
+        <div class="skill-input-group">
+          <input type="text" id="newSkillInput" placeholder="e.g., Branding, UI/UX, Motion" maxlength="30">
+          <button id="addSkillBtn" class="btn-primary small">+ Add</button>
+        </div>
+        <div id="skillsTagContainer" class="tags-container"></div>
+      </div>
+
+      <div class="control-group">
+        <label><i class="fa-regular fa-layer-group"></i> Featured work (projects)</label>
+        <button id="addProjectBtn" class="btn-primary full-width">
+          <i class="fa-regular fa-plus"></i> Add new project
+        </button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="action-buttons">
+        <button id="exportDataBtn" class="btn-outline">
+          <i class="fa-regular fa-download"></i> Export as JSON
+        </button>
+        <button id="resetAllBtn" class="btn-danger">
+          <i class="fa-regular fa-trash-can"></i> Reset theme
+        </button>
+      </div>
+      <p class="sidebar-hint">
+        <i class="fa-regular fa-wand-magic"></i> Every change flows with motion
+      </p>
+    </aside>
+
+    <!-- PREVIEW PANEL - Creative Layout -->
+    <main class="preview-panel">
+      <div id="portfolioRoot" class="portfolio-container"></div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

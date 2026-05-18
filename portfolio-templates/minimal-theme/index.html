@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Professional Minimal Portfolio - Clean, elegant, ATS-friendly corporate portfolio" />
+  <meta name="keywords" content="portfolio, resume, CV, professional, corporate, minimal" />
+  <title>Professional Portfolio | Minimal Corporate Theme</title>
+  
+  <!-- Preconnect & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- SIDEBAR – Controls Panel -->
+    <aside class="sidebar" aria-label="Portfolio controls">
+      <div class="logo-area">
+        <div class="logo-mark">
+          <span>◆</span>
+        </div>
+        <div>
+          <h2>Professional Portfolio</h2>
+          <p>minimal · corporate · ats-ready</p>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="inputName"><i class="fa-regular fa-user"></i> Full name</label>
+        <input type="text" id="inputName" placeholder="Sarah Johnson" autocomplete="off" maxlength="50">
+      </div>
+
+      <div class="control-group">
+        <label for="inputTitle"><i class="fa-regular fa-briefcase"></i> Professional title</label>
+        <input type="text" id="inputTitle" placeholder="Senior Product Manager" maxlength="60">
+      </div>
+
+      <div class="control-group">
+        <label for="inputBio"><i class="fa-regular fa-file-lines"></i> Professional summary</label>
+        <textarea id="inputBio" rows="4" placeholder="Results-driven professional with 8+ years of experience in product strategy, team leadership, and data-driven decision making. Proven track record of delivering scalable solutions and driving business growth." maxlength="400"></textarea>
+        <small class="char-counter">0/400 characters</small>
+      </div>
+
+      <div class="control-group">
+        <label for="inputEmail"><i class="fa-regular fa-envelope"></i> Email address</label>
+        <input type="email" id="inputEmail" placeholder="sarah.johnson@example.com">
+      </div>
+
+      <div class="control-group">
+        <label for="inputPhone"><i class="fa-regular fa-phone"></i> Phone number</label>
+        <input type="tel" id="inputPhone" placeholder="+1 (555) 123-4567">
+      </div>
+
+      <div class="control-group">
+        <label for="inputLocation"><i class="fa-regular fa-location-dot"></i> Location</label>
+        <input type="text" id="inputLocation" placeholder="San Francisco, CA">
+      </div>
+
+      <div class="control-group">
+        <label for="inputLinkedIn"><i class="fa-brands fa-linkedin"></i> LinkedIn URL</label>
+        <input type="url" id="inputLinkedIn" placeholder="https://linkedin.com/in/sarahjohnson">
+      </div>
+
+      <div class="control-group">
+        <label for="inputGithub"><i class="fa-brands fa-github"></i> GitHub URL</label>
+        <input type="url" id="inputGithub" placeholder="https://github.com/sarahjohnson">
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="control-group">
+        <label><i class="fa-regular fa-code"></i> Core competencies</label>
+        <div class="skill-input-group">
+          <input type="text" id="newSkillInput" placeholder="e.g., Product Strategy, Data Analytics" maxlength="40">
+          <button id="addSkillBtn" class="btn-primary small">+ Add</button>
+        </div>
+        <div id="skillsTagContainer" class="tags-container"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="control-group">
+        <label><i class="fa-regular fa-chart-line"></i> Work experience</label>
+        <button id="addExperienceBtn" class="btn-outline full-width">
+          <i class="fa-regular fa-plus"></i> Add position
+        </button>
+      </div>
+
+      <div class="control-group">
+        <label><i class="fa-regular fa-graduation-cap"></i> Education</label>
+        <button id="addEducationBtn" class="btn-outline full-width">
+          <i class="fa-regular fa-plus"></i> Add degree
+        </button>
+      </div>
+
+      <div class="control-group">
+        <label><i class="fa-regular fa-certificate"></i> Certifications</label>
+        <div class="cert-input-group">
+          <input type="text" id="newCertInput" placeholder="e.g., PMP, AWS Certified">
+          <button id="addCertBtn" class="btn-primary small">+ Add</button>
+        </div>
+        <div id="certsTagContainer" class="tags-container"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="action-buttons">
+        <button id="exportDataBtn" class="btn-outline">
+          <i class="fa-regular fa-download"></i> Export as PDF/JSON
+        </button>
+        <button id="printResumeBtn" class="btn-outline">
+          <i class="fa-regular fa-print"></i> Print / Save as PDF
+        </button>
+        <button id="resetAllBtn" class="btn-danger">
+          <i class="fa-regular fa-trash-can"></i> Reset all data
+        </button>
+      </div>
+      <p class="sidebar-hint">
+        <i class="fa-regular fa-circle-info"></i> ATS-friendly format · Recruiter approved
+      </p>
+    </aside>
+
+    <!-- PREVIEW PANEL – Corporate Portfolio -->
+    <main class="preview-panel">
+      <div id="portfolioRoot" class="portfolio-container"></div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
